@@ -76,7 +76,7 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --transition-smooth: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      --transition-smooth: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
     }
 
     [data-theme="dark"] {
@@ -151,13 +151,32 @@
       font-family: 'Outfit', sans-serif;
     }
 
+    /* Professional Universal SVG Icon Helper */
+    .icon-svg {
+      width: 1.15em;
+      height: 1.15em;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: -0.15em;
+      display: inline-block;
+      transition: var(--transition-smooth);
+    }
+
+    .kpi-icon-box .icon-svg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+
     /* ==========================================================================
-       2. HEADER, LOGO INTEGRATION & TOP CONTROL BAR
+       2. HEADER, LOGO TRANSPARENCY & VIEW SWITCHER NAVIGATION
        ========================================================================== */
     header {
       background: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 0.85rem 2rem;
+      padding: 0.75rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -171,23 +190,65 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
     }
 
     .logo-group {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
-    /* Minimalist Logo Image Styling */
+    /* Minimalist Logo Image & Theme Contrast Filter */
     .header-logo-img {
-      height: 40px;
+      height: 44px;
+      max-height: 50px;
       width: auto;
       object-fit: contain;
       vertical-align: middle;
-      filter: contrast(105%);
+      transition: var(--transition-smooth);
+    }
+
+    [data-theme="dark"] .header-logo-img {
+      filter: invert(1) brightness(1.25);
+    }
+
+    /* Navigation View Tabs Switcher */
+    .view-switch-nav {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card-elevated);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      gap: 0.25rem;
+    }
+
+    .view-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: var(--transition-smooth);
+    }
+
+    .view-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .view-tab-btn.active {
+      background: var(--bg-card);
+      color: var(--primary-green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
 
     /* Interactive Grid Status Toggle Pill */
@@ -259,7 +320,7 @@
       background: var(--bg-card-hover);
     }
 
-    /* Maintained Top Right Header Global Stats Navigation */
+    /* Top Right Header Global Stats Navigation */
     nav.nav-stats {
       display: flex;
       align-items: center;
@@ -288,7 +349,32 @@
     }
 
     /* ==========================================================================
-       3. MAIN LAYOUT & MINIMALIST CARD STYLING
+       3. STREAMLIT UNIFIED IFRAME CONTAINER (FULL WIDTH / HEIGHT & NO BORDERS)
+       ========================================================================== */
+    .iframe-view-container {
+      width: 100%;
+      height: calc(100vh - 66px);
+      border: none;
+      background: var(--bg-main);
+      overflow: hidden;
+      display: none;
+    }
+
+    .iframe-view-container.active {
+      display: block;
+    }
+
+    .streamlit-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: none;
+      overflow: hidden;
+      display: block;
+    }
+
+    /* ==========================================================================
+       4. MAIN DASHBOARD & MINIMALIST CARD STYLING
        ========================================================================== */
     main {
       max-width: 1600px;
@@ -299,6 +385,10 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+    }
+
+    main.hidden {
+      display: none;
     }
 
     .kpi-grid {
@@ -358,7 +448,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
     }
 
     /* Two-Column Responsive Layout */
@@ -398,7 +487,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.85rem;
+      padding-bottom: 1rem;
     }
 
     .card-title-group {
@@ -408,8 +497,10 @@
     }
 
     .card-title-icon {
+      font-size: 1.25rem;
       color: var(--primary-green);
-      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
     }
 
     .card-title {
@@ -423,38 +514,35 @@
       color: var(--text-muted);
     }
 
-    /* ==========================================================================
-       4. CHART & V2G VISUALIZATION
-       ========================================================================== */
+    /* Dual Axis Chart Container */
     .chart-wrapper {
       position: relative;
-      width: 100%;
       height: 340px;
+      width: 100%;
     }
 
     .chart-legend-badge {
       display: flex;
+      align-items: center;
       gap: 1rem;
       font-size: 0.75rem;
+      color: var(--text-muted);
       font-weight: 600;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      color: var(--text-secondary);
+      gap: 0.35rem;
     }
 
     .legend-box {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
     }
 
-    /* ==========================================================================
-       5. TELEMATICS DATA TABLE
-       ========================================================================== */
+    /* Telematics Table Styling */
     .table-controls {
       display: flex;
       justify-content: space-between;
@@ -466,37 +554,32 @@
     .search-box {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 0.45rem 0.85rem;
       color: var(--text-main);
-      font-family: inherit;
-      font-size: 0.85rem;
-      width: 220px;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.825rem;
+      outline: none;
+      min-width: 220px;
       transition: var(--transition-smooth);
     }
 
     .search-box:focus {
-      outline: none;
       border-color: var(--border-active);
     }
 
     .filter-tabs {
       display: flex;
-      gap: 0.4rem;
-      background: var(--bg-input);
-      padding: 0.25rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-color);
+      gap: 0.35rem;
     }
 
     .tab-btn {
-      background: transparent;
-      border: none;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
       color: var(--text-muted);
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
-      font-weight: 600;
+      padding: 0.4rem 0.75rem;
       border-radius: 6px;
+      font-size: 0.775rem;
+      font-weight: 600;
       cursor: pointer;
       transition: var(--transition-smooth);
     }
@@ -596,22 +679,12 @@
     }
 
     /* ==========================================================================
-       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS
+       5. AI OPTIMIZATION CONTROL ENGINE & SLIDERS
        ========================================================================== */
     .slider-group {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-      background: var(--bg-card-elevated);
-      padding: 1.25rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      transition: var(--transition-smooth);
-    }
-
-    .slider-group.disabled {
-      opacity: 0.55;
-      pointer-events: none;
     }
 
     .slider-item {
@@ -624,29 +697,28 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
     }
 
     .slider-label {
-      font-size: 0.85rem;
+      font-size: 0.825rem;
       font-weight: 600;
       color: var(--text-main);
     }
 
     .slider-value-display {
-      font-size: 0.85rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 800;
       color: var(--primary-green);
-      background: var(--primary-green-light);
-      padding: 0.15rem 0.5rem;
-      border-radius: 6px;
     }
 
     input[type="range"] {
       -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 6px;
-      border-radius: 3px;
       background: var(--border-color);
+      border-radius: 4px;
       outline: none;
       cursor: pointer;
     }
@@ -837,18 +909,30 @@
 
   <!-- Floating Toast Notification Banner -->
   <div id="toastNotification" class="toast-notification">
-    <span>✅</span>
+    <svg class="icon-svg" style="color: var(--status-green);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     <span id="toastMessage">Schedule Synchronized with Fleet</span>
   </div>
 
   <!-- ==========================================================================
-       HEADER: Logo Integration (logo.png) + Minimalist Theme Toggle & Global Stats
+       HEADER: Transparent Logo Integration + View Switcher + Theme Toggle
        ========================================================================== -->
   <header>
     <div class="header-container">
       <div class="logo-group">
-        <!-- New Logo Integration: Gemini_Generated_Image_n26va3n26va3n26v.png -->
-        <img src="Gemini_Generated_Image_n26va3n26va3n26v.png" alt="Fleet Management Logo" class="header-logo-img" onError="this.src='logo.png';">
+        <!-- Transparent Logo Integration with Fallback & Dark Mode Filters -->
+        <img src="logo_transparent.png" alt="Fleet Management Logo" class="header-logo-img" onError="this.src='Gemini_Generated_Image_n26va3n26va3n26v.png';">
+
+        <!-- Unified View Navigation Switcher Tabs -->
+        <div class="view-switch-nav">
+          <button id="tabDashboard" class="view-tab-btn active" onclick="switchView('dashboard')">
+            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </button>
+          <button id="tabStreamlit" class="view-tab-btn" onclick="switchView('streamlit')">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Streamlit Engine</span>
+          </button>
+        </div>
 
         <!-- Interactive Grid Status Toggle Pill -->
         <div id="gridStatusPill" class="grid-toggle-pill" onclick="toggleGridStatus()" title="Click to toggle Grid Connection status">
@@ -856,14 +940,16 @@
           <span id="gridStatusText">GRID SYNCHRONIZED</span>
         </div>
 
-        <!-- Light/Dark Mode Toggle Button -->
+        <!-- Light/Dark Mode Toggle Button with Professional SVG Icon -->
         <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
-          <span id="themeToggleIcon">☀️</span>
+          <span id="themeToggleIcon">
+            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </span>
           <span id="themeToggleText">Light</span>
         </button>
       </div>
 
-      <!-- Maintained Top Right Header Global Stats -->
+      <!-- Header Global Stats Navigation -->
       <nav class="nav-stats">
         <div class="nav-stat-item">
           <span class="nav-stat-label">Active Fleet</span>
@@ -882,11 +968,18 @@
   </header>
 
   <!-- ==========================================================================
-       MAIN DASHBOARD: KPI Grid + 2-Column Responsive Layout
+       UNIFIED STREAMLIT IFRAME VIEW (FULL WIDTH / HEIGHT WITH HIDDEN BORDERS)
        ========================================================================== -->
-  <main>
+  <section id="streamlitIframeView" class="iframe-view-container">
+    <iframe src="http://localhost:8501" class="streamlit-iframe" title="Streamlit AI Controller Engine"></iframe>
+  </section>
 
-    <!-- Top KPI Metric Cards -->
+  <!-- ==========================================================================
+       MAIN HTML DASHBOARD: KPI Grid + 2-Column Responsive Layout
+       ========================================================================== -->
+  <main id="mainDashboardView">
+
+    <!-- Top KPI Metric Cards with Minimalist SVG Icons -->
     <section class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-info">
@@ -894,7 +987,9 @@
           <span class="kpi-num" style="color: var(--status-yellow);">$0.48 / kWh</span>
           <span class="kpi-sub" style="color: var(--status-yellow);">Peak Rate Window (4-7 PM)</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">📈</div>
+        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
@@ -903,7 +998,9 @@
           <span class="kpi-num" id="kpiNetLoad" style="color: var(--primary-green);">180 kW</span>
           <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-v2g);">Includes -80 kW V2G Feed-In</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--primary-green-light); color: var(--primary-green);">⚡</div>
+        <div class="kpi-icon-box" style="background: var(--primary-green-light); color: var(--primary-green);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
@@ -912,7 +1009,9 @@
           <span class="kpi-num" style="color: var(--status-green);">94.2%</span>
           <span class="kpi-sub" style="color: var(--status-green);">+3.1% cycle life extension</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">🔋</div>
+        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="11" x2="23" y2="13"/><polyline points="11 7 8 12 12 12 9 17"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
@@ -921,21 +1020,25 @@
           <span class="kpi-num" style="color: var(--accent-v2g);">$340.00</span>
           <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(113, 128, 150, 0.12); color: var(--text-secondary);">🔄</div>
+        <div class="kpi-icon-box" style="background: rgba(113, 128, 150, 0.12); color: var(--text-secondary);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        </div>
       </div>
     </section>
 
     <!-- 2-Column Main Layout -->
     <div class="dashboard-body">
 
-      <!-- LEFT COLUMN: Dual Axis Chart with V2G Negative Bars & Telematics Table -->
+      <!-- LEFT COLUMN: Dual Axis Chart & Telematics Table -->
       <div class="left-column">
 
         <!-- Module 1: Central Dual-Axis Chart -->
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">📊</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">Scheduled Fleet Load vs. Grid Price Forecast</h2>
                 <div class="card-subtitle">Visualizing V2G discharge (negative kW) during peak price window</div>
@@ -958,7 +1061,9 @@
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">🚘</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">EV Fleet Telematics & Battery Health</h2>
                 <div class="card-subtitle">Real-time State of Charge (SOC%), State of Health (SOH%), and Battery Temperature</div>
@@ -1004,7 +1109,9 @@
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">🤖</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">AI Optimization Control Engine</h2>
                 <div class="card-subtitle">Relative multi-objective trade-off weights (Sum = 100%)</div>
@@ -1037,7 +1144,7 @@
               </div>
             </div>
 
-            <!-- Maintained Strategy Presets Buttons -->
+            <!-- Strategy Presets Buttons -->
             <div>
               <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Strategy Presets:</span>
               <div class="preset-btns">
@@ -1051,7 +1158,10 @@
           <!-- Module 4: AI Action Center -->
           <div id="aiActionCenter" class="ai-action-center">
             <div class="ai-header-bar">
-              <span class="ai-badge" id="aiStatusBadge">✨ Strategy: Cost Minimization - 70%</span>
+              <span class="ai-badge" id="aiStatusBadge">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>Strategy: Cost Minimization - 70%</span>
+              </span>
               <span style="font-size: 0.725rem; color: var(--text-muted);" id="aiTimestamp">Updated just now</span>
             </div>
 
@@ -1073,7 +1183,7 @@
 
             <button id="btnAcceptOptimization" class="btn-accept" onclick="acceptOptimization()">
               <span>Accept & Apply Optimization</span>
-              <span>→</span>
+              <svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           </div>
         </section>
@@ -1091,13 +1201,10 @@
   </footer>
 
   <!-- ==========================================================================
-       JAVASCRIPT ENGINE & LOGIC (WITH THEME SYSTEM MANAGER & LOGO HANDLING)
-       ========================================================================== */
-  -->
+       JAVASCRIPT ENGINE & LOGIC (WITH VIEW SWITCHER & SVG THEME HANDLING)
+       ========================================================================== -->
   <script>
-    /* ==========================================================================
-       A. TELEMATICS DATA ARRAY
-       ========================================================================== */
+    /* Telematics Data Array */
     const telematicsData = [
       { id: 'EV-101', group: 'Delivery Logistics', soc: 35, soh: 94, temp: 28, status: 'HEALTHY' },
       { id: 'EV-102', group: 'Executive Transit', soc: 82, soh: 98, temp: 25, status: 'HEALTHY' },
@@ -1109,9 +1216,7 @@
       { id: 'EV-108', group: 'Urban Express',     soc: 76, soh: 93, temp: 32, status: 'HEALTHY' }
     ];
 
-    /* ==========================================================================
-       B. GLOBAL STATE & DOM REFERENCES
-       ========================================================================== */
+    /* Global State & DOM References */
     let isGridConnected = true;
     let isApplied = false;
     let currentFilter = 'ALL';
@@ -1133,9 +1238,27 @@
     const toastNotification = document.getElementById('toastNotification');
     const toastMessage = document.getElementById('toastMessage');
 
-    /* ==========================================================================
-       C. DUAL THEME MANAGER (MINIMALIST LIGHT DEFAULT / DARK PERSISTENT)
-       ========================================================================== */
+    const mainDashboardView = document.getElementById('mainDashboardView');
+    const streamlitIframeView = document.getElementById('streamlitIframeView');
+    const tabDashboard = document.getElementById('tabDashboard');
+    const tabStreamlit = document.getElementById('tabStreamlit');
+
+    /* View Switcher Handler */
+    function switchView(viewName) {
+      if (viewName === 'streamlit') {
+        mainDashboardView.classList.add('hidden');
+        streamlitIframeView.classList.add('active');
+        tabDashboard.classList.remove('active');
+        tabStreamlit.classList.add('active');
+      } else {
+        streamlitIframeView.classList.remove('active');
+        mainDashboardView.classList.remove('hidden');
+        tabStreamlit.classList.remove('active');
+        tabDashboard.classList.add('active');
+      }
+    }
+
+    /* Dual Theme Manager */
     function initTheme() {
       const savedTheme = localStorage.getItem('voltai_theme') || 'light';
       applyTheme(savedTheme);
@@ -1148,14 +1271,20 @@
     }
 
     function applyTheme(theme) {
+      const iconContainer = document.getElementById('themeToggleIcon');
+      const textContainer = document.getElementById('themeToggleText');
+
+      const sunSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+      const moonSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
       if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('themeToggleIcon').textContent = '🌙';
-        document.getElementById('themeToggleText').textContent = 'Dark';
+        iconContainer.innerHTML = moonSvg;
+        textContainer.textContent = 'Dark';
       } else {
-        document.documentElement.removeAttribute('data-theme'); // default Light mode
-        document.getElementById('themeToggleIcon').textContent = '☀️';
-        document.getElementById('themeToggleText').textContent = 'Light';
+        document.documentElement.removeAttribute('data-theme');
+        iconContainer.innerHTML = sunSvg;
+        textContainer.textContent = 'Light';
       }
       localStorage.setItem('voltai_theme', theme);
       updateChartTheme();
@@ -1184,9 +1313,7 @@
       chargingPricingChart.update();
     }
 
-    /* ==========================================================================
-       D. SLIDER LOGIC & STATE BINDING (SUM TO 100%)
-       ========================================================================== */
+    /* Slider Logic & State Binding */
     function handleSliderChange(source) {
       if (isApplied) {
         unlockSliders();
@@ -1216,13 +1343,11 @@
       longevitySlider.disabled = false;
       sliderContainer.classList.remove('disabled');
       aiActionCenter.classList.remove('applied');
-      btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
+      btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
       isApplied = false;
     }
 
-    /* ==========================================================================
-       E. CHART.JS DUAL-AXIS CHART WITH V2G (-kW) & CURRENT TIME DASHED LINE
-       ========================================================================== */
+    /* Chart.js Dual Axis Chart */
     const hoursLabels = ['12 PM', '1 PM', '2 PM (NOW)', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
     const electricityPrices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12];
 
@@ -1262,40 +1387,40 @@
           ctx.stroke();
 
           ctx.fillStyle = '#E53E3E';
-          ctx.font = 'bold 10px Inter';
-          ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
+          ctx.font = 'bold 10px Inter, sans-serif';
+          ctx.fillText('CURRENT TIME', x - 35, topY - 6);
           ctx.restore();
         }
       }
     };
 
-    const ctx = document.getElementById('chargingPricingChart').getContext('2d');
-    const chargingPricingChart = new Chart(ctx, {
+    const ctxChart = document.getElementById('chargingPricingChart').getContext('2d');
+    let chargingPricingChart = new Chart(ctxChart, {
       type: 'bar',
       data: {
         labels: hoursLabels,
         datasets: [
           {
             type: 'line',
-            label: 'Grid Price ($/kWh)',
+            label: 'Grid Electricity Price ($/kWh)',
             data: electricityPrices,
             borderColor: '#D69E2E',
-            backgroundColor: 'rgba(214, 158, 46, 0.12)',
+            backgroundColor: 'rgba(214, 158, 46, 0.1)',
             borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            yAxisID: 'yPrice',
-            pointRadius: 4
+            tension: 0.35,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#D69E2E',
+            yAxisID: 'yPrice'
           },
           {
             type: 'bar',
-            label: 'Scheduled Fleet Load (kW)',
+            label: 'Scheduled Fleet Net Load (kW)',
             data: getCalculatedLoad(),
             backgroundColor: function(context) {
               const val = context.raw;
               const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-              const oliveColor = isDark ? 'rgba(104, 139, 94, 0.85)' : 'rgba(75, 96, 67, 0.85)';
-              return val < 0 ? 'rgba(113, 128, 150, 0.85)' : oliveColor;
+              return val < 0 ? 'rgba(113, 128, 150, 0.85)' : (isDark ? 'rgba(104, 139, 94, 0.9)' : 'rgba(75, 96, 67, 0.9)');
             },
             borderColor: function(context) {
               const val = context.raw;
@@ -1325,9 +1450,9 @@
               label: function(context) {
                 if (context.dataset.label.includes('Load')) {
                   const val = context.raw;
-                  return val < 0 ? ` 🔄 V2G Feed-In Discharge: ${val} kW (Selling to Grid)` : ` ⚡ Fleet Charging Draw: ${val} kW`;
+                  return val < 0 ? ` V2G Discharge: ${val} kW` : ` Fleet Charging Draw: ${val} kW`;
                 }
-                return ` 📈 Grid Price: $${context.raw.toFixed(2)}/kWh`;
+                return ` Grid Price: $${context.raw.toFixed(2)}/kWh`;
               }
             }
           }
@@ -1360,9 +1485,7 @@
       }
     });
 
-    /* ==========================================================================
-       F. INTERACTIVE GRID STATUS TOGGLE PILL
-       ========================================================================== */
+    /* Interactive Grid Status Toggle */
     function toggleGridStatus() {
       isGridConnected = !isGridConnected;
 
@@ -1379,9 +1502,7 @@
       updateUI();
     }
 
-    /* ==========================================================================
-       G. DYNAMIC AI REASONING ENGINE (STATE BINDING & SAVINGS CALCULATION)
-       ========================================================================== */
+    /* Dynamic AI Reasoning Engine UI Update */
     function updateUI() {
       const costWeight = parseInt(costSlider.value);
       const longevityWeight = parseInt(longevitySlider.value);
@@ -1397,15 +1518,17 @@
 
       const dominantStrategy = costWeight >= 50 ? 'Cost Minimization' : 'Battery Longevity Protection';
       const dominantVal = costWeight >= 50 ? costWeight : longevityWeight;
+
+      const sparklesSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
       
       if (!isApplied) {
-        aiStatusBadge.textContent = `✨ Strategy: ${dominantStrategy} - ${dominantVal}%`;
+        aiStatusBadge.innerHTML = `${sparklesSvg} <span>Strategy: ${dominantStrategy} - ${dominantVal}%</span>`;
       }
 
       let recText = '';
 
       if (!isGridConnected) {
-        recText = `<strong>⚠️ GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. Fleet Management system has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
+        recText = `<strong>GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. Fleet Management system has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
       } else if (costWeight >= 50) {
         recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With <strong>Strategy: Cost Minimization - ${costWeight}%</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, generating <strong>$340.00</strong> in V2G revenues and yielding <strong>$${calculatedSavings}.00</strong> in projected nightly savings.`;
       } else {
@@ -1415,12 +1538,10 @@
       aiRecommendationText.innerHTML = recText;
     }
 
-    /* ==========================================================================
-       H. INTERACTIVE ACCEPT STATE & TOAST NOTIFICATION
-       ========================================================================== */
+    /* Interactive Accept State */
     function acceptOptimization() {
       if (!isGridConnected) {
-        showToast("⚠️ Cannot deploy AI schedule while Grid is Disconnected", "warning");
+        showToast("Cannot deploy AI schedule while Grid is Disconnected", "warning");
         return;
       }
 
@@ -1429,8 +1550,9 @@
       sliderContainer.classList.add('disabled');
 
       aiActionCenter.classList.add('applied');
-      aiStatusBadge.textContent = '✓ Schedule Synchronized with Fleet';
-      btnAcceptOptimization.innerHTML = `<span>Schedule Deployed & Enforced</span> <span>✓</span>`;
+      const checkSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+      aiStatusBadge.innerHTML = `${checkSvg} <span>Schedule Synchronized with Fleet</span>`;
+      btnAcceptOptimization.innerHTML = `<span>Schedule Deployed & Enforced</span> ${checkSvg}`;
       isApplied = true;
 
       showToast("Schedule Synchronized with Fleet", "success");
@@ -1445,9 +1567,7 @@
       }, 3500);
     }
 
-    /* ==========================================================================
-       I. TELEMATICS TABLE RENDERER
-       ========================================================================== */
+    /* Telematics Table Renderer */
     function renderTelematicsTable(data) {
       telematicsTableBody.innerHTML = '';
 
@@ -1462,13 +1582,13 @@
         let progressColor = 'var(--status-green)';
 
         if (vehicle.status === 'HEALTHY') {
-          statusBadgeHtml = `<span class="status-badge healthy">● Healthy</span>`;
+          statusBadgeHtml = `<span class="status-badge healthy">Healthy</span>`;
           progressColor = 'var(--status-green)';
         } else if (vehicle.status === 'WARNING') {
-          statusBadgeHtml = `<span class="status-badge warning">▲ Throttled</span>`;
+          statusBadgeHtml = `<span class="status-badge warning">Throttled</span>`;
           progressColor = 'var(--status-yellow)';
         } else {
-          statusBadgeHtml = `<span class="status-badge critical">✖ Critical / Hot</span>`;
+          statusBadgeHtml = `<span class="status-badge critical">Critical / Hot</span>`;
           progressColor = 'var(--status-red)';
         }
 
@@ -1519,7 +1639,7 @@
 
     tableSearchInput.addEventListener('input', applyTableFilters);
 
-    // Initial Load & Theme Manager Initialization
+    /* Initial Load */
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       renderTelematicsTable(telematicsData);
