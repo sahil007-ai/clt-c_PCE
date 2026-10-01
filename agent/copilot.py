@@ -21,6 +21,7 @@ from agent.prompts import (
     PLANNER_RULES,
     SCENARIO_ANALYST_RULES,
 )
+from agent.tracing import traceable
 import os
 from pathlib import Path
 
@@ -64,6 +65,7 @@ class CopilotBriefing:
 class PlannerAgent:
     """Interprets operator priorities and compares checked proposals."""
 
+    @traceable(name="PlannerAgent", run_type="chain", tags=["copilot", "specialist", "planner"])
     def analyze(self, result: CoordinationResult) -> AgentReport:
         selected = result.selected
         proposals = result.proposals
@@ -118,6 +120,7 @@ class PlannerAgent:
 class ScenarioAnalystAgent:
     """Analyzes active depot disruption events and replanning diffs."""
 
+    @traceable(name="ScenarioAnalystAgent", run_type="chain", tags=["copilot", "specialist", "scenario_analyst"])
     def analyze(self, result: CoordinationResult, event: dict | None = None) -> AgentReport:
         schedule = result.selected.schedule
         total_assignments = len(schedule.assignments)
@@ -193,6 +196,7 @@ class ScenarioAnalystAgent:
 class BatteryHealthReviewerAgent:
     """Inspects fleet thermal telemetry, SOH, and charging mode stress."""
 
+    @traceable(name="BatteryHealthReviewerAgent", run_type="chain", tags=["copilot", "specialist", "battery_health"])
     def analyze(self, result: CoordinationResult) -> AgentReport:
         vehicles = result.planning_input.vehicles
         schedule = result.selected.schedule
@@ -242,6 +246,7 @@ class BatteryHealthReviewerAgent:
 class DataQualitySafetyReviewerAgent:
     """Audits data provenance, independent verifier gates, and safety boundaries."""
 
+    @traceable(name="DataQualitySafetyReviewerAgent", run_type="chain", tags=["copilot", "specialist", "data_safety"])
     def analyze(self, result: CoordinationResult) -> AgentReport:
         tariff = result.planning_input.tariff
         check = result.selected.check
@@ -282,6 +287,7 @@ class DataQualitySafetyReviewerAgent:
 class OperatorBriefingAgent:
     """Synthesizes specialist findings into an actionable executive briefing."""
 
+    @traceable(name="OperatorBriefingAgent", run_type="chain", tags=["copilot", "specialist", "briefing_lead"])
     def analyze(
         self,
         planner: AgentReport,
@@ -370,6 +376,7 @@ class OperatorBriefingAgent:
         )
 
 
+@traceable(name="VoltAI_OperationsCopilot", run_type="chain", tags=["voltai", "copilot", "multi_agent_workflow"])
 def run_operations_copilot(
     coordination_result: CoordinationResult,
     event: dict | None = None,

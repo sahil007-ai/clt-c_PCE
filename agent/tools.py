@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from agent.tracing import traceable
 from engine.checker import check_schedule
 from engine.events import apply_event
 from engine.schemas import CheckResult, ObjectiveWeights, PlanningInput, Schedule
@@ -27,6 +28,7 @@ class EngineTools:
     def __init__(self, planning_input: PlanningInput):
         self.planning_input = planning_input
 
+    @traceable(name="EngineTools_Propose", run_type="tool", tags=["engine", "scheduler", "proposal"])
     def propose(self, name: str, weights: ObjectiveWeights) -> ToolProposal:
         schedule = optimize_schedule(self.planning_input, weights, strategy=name)
         return ToolProposal(name, weights.normalized(), schedule, check_schedule(self.planning_input, schedule))
@@ -35,6 +37,7 @@ class EngineTools:
         return EngineTools(apply_event(self.planning_input, event))
 
 
+@traceable(name="RecordApproval", run_type="tool", tags=["safety", "operator_approval", "audit"])
 def record_approval(
     schedule: Schedule,
     *,

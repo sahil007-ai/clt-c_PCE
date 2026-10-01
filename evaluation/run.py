@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from agent.graph import coordinate_plan
+from agent.tracing import traceable
 from engine.generate import DEFAULT_DATA_DIR, PROJECT_ROOT, load_planning_input
 from engine.schemas import ObjectiveWeights
 from evaluation.baselines import baseline_results
@@ -25,6 +26,7 @@ def _event_for(index: int, rng: random.Random) -> dict | None:
     return {"type": "price_spike", "start_slot": 16, "end_slot": 20, "price": 12.0}
 
 
+@traceable(name="VoltAI_SeededEvaluation", run_type="chain")
 def run_evaluation(seed: int = 42, scenarios: int = 50) -> dict:
     rng = random.Random(seed)
     planning_input = load_planning_input(DEFAULT_DATA_DIR)
