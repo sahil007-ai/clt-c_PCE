@@ -1,9 +1,10 @@
 from PIL import Image
+import os
 
 def make_transparent(input_path, output_path, threshold=240):
     """
-    Reads an image, converts white / near-white pixels to transparent alpha,
-    and saves the output as a transparent PNG file.
+    Reads an image, converts white / near-white background pixels to transparent alpha,
+    and saves the output as a transparent PNG file ("logo_transparent.png").
     """
     img = Image.open(input_path).convert("RGBA")
     pixels = img.load()
@@ -20,10 +21,24 @@ def make_transparent(input_path, output_path, threshold=240):
     print(f"Successfully saved transparent logo to {output_path}")
 
 if __name__ == "__main__":
-    import os
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    input_file = os.path.join(base_dir, "Gemini_Generated_Image_n26va3n26va3n26v.png")
-    if not os.path.exists(input_file):
-        input_file = os.path.join(base_dir, "logo.png")
+    
+    # Check for possible input image file names
+    possible_inputs = [
+        "Gemini_Generated_Image_n26va3n26va3n26v_2.png",
+        "Gemini_Generated_Image_n26va3n26va3n26v.png",
+        "logo.png"
+    ]
+    
+    input_file = None
+    for filename in possible_inputs:
+        candidate = os.path.join(base_dir, filename)
+        if os.path.exists(candidate):
+            input_file = candidate
+            break
+
+    if not input_file:
+        raise FileNotFoundError("No input logo image found to process.")
+
     output_file = os.path.join(base_dir, "logo_transparent.png")
     make_transparent(input_file, output_file)
