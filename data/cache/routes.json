@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "source": "seeded-demo-fixture",
+  "fetched_at": "2026-10-01T00:00:00Z",
+  "validation_status": "cached-fixture",
+  "routes": [
+    {"route_id": "R-01", "distance_km": 120, "duration_minutes": 280},
+    {"route_id": "R-02", "distance_km": 45, "duration_minutes": 115}
+  ]
+}

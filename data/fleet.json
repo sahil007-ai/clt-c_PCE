@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "source": "seeded-demo-fixture",
+  "generated_at": "2026-10-01T00:00:00Z",
+  "vehicles": [
+    {"vehicle_id": "EV-101", "route_id": "R-01", "battery_capacity_kwh": 60, "soc_percent": 35, "soh_percent": 94, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 0, "departure_slot": 24, "temperature_c": 28},
+    {"vehicle_id": "EV-102", "route_id": "R-02", "battery_capacity_kwh": 60, "soc_percent": 82, "soh_percent": 98, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 0, "departure_slot": 20, "temperature_c": 25},
+    {"vehicle_id": "EV-103", "route_id": "R-03", "battery_capacity_kwh": 60, "soc_percent": 18, "soh_percent": 86, "target_soc_percent": 92, "reserve_percent": 20, "max_soc_percent": 92, "return_slot": 4, "departure_slot": 18, "temperature_c": 41},
+    {"vehicle_id": "EV-104", "route_id": "R-04", "battery_capacity_kwh": 75, "soc_percent": 65, "soh_percent": 91, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 2, "departure_slot": 28, "temperature_c": 31},
+    {"vehicle_id": "EV-105", "route_id": "R-05", "battery_capacity_kwh": 60, "soc_percent": 45, "soh_percent": 88, "target_soc_percent": 85, "reserve_percent": 15, "max_soc_percent": 85, "return_slot": 6, "departure_slot": 22, "temperature_c": 37},
+    {"vehicle_id": "EV-106", "route_id": "R-06", "battery_capacity_kwh": 75, "soc_percent": 92, "soh_percent": 96, "target_soc_percent": 92, "reserve_percent": 15, "max_soc_percent": 92, "return_slot": 0, "departure_slot": 30, "temperature_c": 26},
+    {"vehicle_id": "EV-107", "route_id": "R-07", "battery_capacity_kwh": 60, "soc_percent": 28, "soh_percent": 84, "target_soc_percent": 90, "reserve_percent": 20, "max_soc_percent": 90, "return_slot": 8, "departure_slot": 20, "temperature_c": 39},
+    {"vehicle_id": "EV-108", "route_id": "R-08", "battery_capacity_kwh": 75, "soc_percent": 76, "soh_percent": 93, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 2, "departure_slot": 32, "temperature_c": 32},
+    {"vehicle_id": "EV-109", "route_id": "R-09", "battery_capacity_kwh": 60, "soc_percent": 54, "soh_percent": 90, "target_soc_percent": 88, "reserve_percent": 15, "max_soc_percent": 88, "return_slot": 10, "departure_slot": 34, "temperature_c": 30},
+    {"vehicle_id": "EV-110", "route_id": "R-10", "battery_capacity_kwh": 75, "soc_percent": 40, "soh_percent": 89, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 4, "departure_slot": 26, "temperature_c": 34},
+    {"vehicle_id": "EV-111", "route_id": "R-11", "battery_capacity_kwh": 60, "soc_percent": 70, "soh_percent": 95, "target_soc_percent": 90, "reserve_percent": 15, "max_soc_percent": 90, "return_slot": 12, "departure_slot": 38, "temperature_c": 27},
+    {"vehicle_id": "EV-112", "route_id": "R-12", "battery_capacity_kwh": 75, "soc_percent": 32, "soh_percent": 87, "target_soc_percent": 90, "reserve_percent": 20, "max_soc_percent": 90, "return_slot": 6, "departure_slot": 24, "temperature_c": 36}
+  ]
+}
