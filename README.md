@@ -9,26 +9,41 @@ requires explicit human approval before a local audit record is created.
 It is not connected to chargers, vehicles, dispatch systems, or live customer
 data. The included tariff and fleet data are clearly labelled fixtures.
 
-## What is implemented
+## Current functions
 
-- Streamlit is the canonical interface: it displays verified plans, candidate
-  trade-offs, per-vehicle readiness, price/load charts, data provenance, and
-  checker failures.
-- A deterministic slot scheduler considers parking windows, per-slot charger
-  capacity, charging modes, departure energy targets, maximum SOC, and explicit
+- **Verified Streamlit dashboard**: `streamlit_app.py` displays checked plans,
+  proposal trade-offs, fleet readiness, charging-load and tariff charts, data
+  provenance, checker failures, and the local approval control.
+- **Standalone visual dashboard**: `index.html` provides a non-operational
+  design prototype with theme switching, simulated grid status, telematics
+  filtering, Chart.js load and price visualisation, and strategy controls.
+- **Deterministic scheduling**: `engine.scheduler.optimize_schedule` creates a
+  30-minute-slot plan using parking windows, charger capacity, charging modes,
+  tariff prices, departure energy targets, battery ceilings, and explicit
   unmet-energy slack.
-- An independent checker recomputes all schedule constraints and cost without
-  importing the scheduler.
-- A tool-mediated deterministic coordinator evaluates cost, availability,
-  battery-health, and operator-weighted proposals. Numeric explanations are
-  checked against tool facts.
-- Charger-failure, late-return, price-spike, and missing-battery-data scenarios
-  are represented as explicit events. Missing data blocks a plan rather than
-  being guessed.
-- Tariff and route cache refresh helpers validate provenance and reject bad data
-  in favour of the last valid cache.
-- Unit tests, a GitHub Actions workflow, a terminal demo, and a seeded
-  evaluation runner are included.
+- **Independent verification**: `engine.checker.check_schedule` recomputes
+  energy needs, parking-window checks, charger capacity, duplicate assignments,
+  mode limits, battery ceilings, and energy cost without importing the scheduler.
+- **Proposal coordination**: `agent.graph.coordinate_plan` requests cost,
+  availability, battery-health, and operator-weighted proposals through
+  `agent.tools.EngineTools`, rejects invalid proposals when valid alternatives
+  exist, and selects the proposal with the lowest weighted score.
+- **Grounded operations copilot**: `agent.copilot.run_operations_copilot`
+  produces planner, disruption, battery-health, data-quality/safety, and
+  operator-briefing reports from checked results. Numeric claims are validated
+  by `agent.grounding.verify_numeric_grounding`.
+- **Disruption simulation**: `engine.events.apply_event` supports charger
+  failures, late returns, tariff price spikes, and missing battery data.
+  Missing battery data raises an error and blocks replanning instead of being
+  guessed.
+- **Validated cache refresh**: `live.routes` and `live.tariffs` validate
+  refreshed payloads and retain the last valid cache when a refresh is rejected.
+- **Local approval audit**: `agent.tools.record_approval` appends the approved
+  schedule and operator name to `saved_outputs/approvals.jsonl`; it never sends
+  commands to charging hardware.
+- **Testing and evaluation**: the repository includes unit tests, a terminal
+  demo, and a seeded scenario evaluator that reports checker validity,
+  grounded explanations, infeasibility escalations, and baseline comparisons.
 
 `index.html` remains an earlier standalone visual prototype. It is not used by
 the scheduling engine and is retained only as a design demo.
@@ -64,8 +79,33 @@ cd clt-c_PCE
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
+
+To run the standalone HTML prototype, serve the repository directory and open
+the printed URL:
+
+```bash
+python -m http.server 8000
+```
+
+The Streamlit dashboard is available at `http://localhost:8501` and the HTML
+prototype at `http://localhost:8000`.
+
+## Visual preview
+
+The standalone dashboard includes the following visual views and controls:
+
+| Dashboard overview | Dark theme |
+| --- | --- |
+| ![VoltAI dashboard light theme](docs/tutorial/images/09_full_dashboard_light.png) | ![VoltAI dashboard dark theme](docs/tutorial/images/10_full_dashboard_dark.png) |
+
+| AI action center | Streamlit engine view |
+| --- | --- |
+| ![VoltAI AI action center](docs/tutorial/images/04_ai_action_center.png) | ![VoltAI Streamlit engine tab](docs/tutorial/images/12_view_switcher_streamlit_tab.png) |
+
+More captured states, including telematics filters, grid status, charts, and
+theme-specific views, are available in [`docs/tutorial/images`](docs/tutorial/images).
 
 Run the terminal demo, test suite, and reproducible evaluation with:
 
@@ -77,6 +117,20 @@ python -m evaluation.run --seed 42 --scenarios 50
 
 The evaluation writes local results to `evaluation/results/`; generated results
 and local approval records are intentionally ignored by Git.
+
+## Main Python functions
+
+| Function | Purpose |
+| --- | --- |
+| `engine.generate.load_planning_input` | Loads typed fleet, route, charger, and cache-first tariff data. |
+| `engine.energy.calculate_all_energy_needs` | Calculates each vehicle's required and maximum charge. |
+| `engine.scheduler.optimize_schedule` | Builds a deterministic charging schedule from objective weights. |
+| `engine.checker.check_schedule` | Independently validates assignments and calculates verified cost. |
+| `engine.events.apply_event` | Creates an adjusted planning snapshot for a supported disruption. |
+| `agent.graph.coordinate_plan` | Generates, checks, scores, and selects proposals. |
+| `agent.copilot.run_operations_copilot` | Creates grounded specialist reports and an operator briefing. |
+| `agent.tools.record_approval` | Writes a local approval record without hardware execution. |
+| `evaluation.run.run_evaluation` | Runs reproducible scenario evaluation and baseline comparison. |
 
 ## Data and safety
 
@@ -90,10 +144,11 @@ source adapter. Leaving them unset keeps the project in safe cache-first mode.
 ## Repository layout
 
 ```text
-app.py                 Canonical Streamlit dashboard
+streamlit_app.py       Canonical Streamlit dashboard
+index.html             Standalone non-operational visual prototype
 data/                  Versioned fixtures and explicitly labelled cache
 engine/                Schemas, energy calculations, scheduler, checker, events
-agent/                 Tool boundary, coordinator, numeric grounding
+agent/                 Tool boundary, coordinator, copilot, numeric grounding
 live/                  Cache and refresh validation helpers
 evaluation/            Baselines and seeded evaluation runner
 tests/                 Engine, checker, data, and coordinator tests
@@ -108,8 +163,8 @@ docs/                  Demo, data-provenance, and safety documentation
 | Runtime | Python 3.11+ |
 | Dashboard | Streamlit, pandas, Altair |
 | Scheduling and verification | Python standard library, typed dataclasses |
-| Agent orchestration | LangGraph StateGraph (Coordinator & Multi-Agent Copilot) |
-| Language model | OpenRouter (`nvidia/nemotron-3-ultra-550b-a55b:free`) with numeric grounding guard |
+| Agent orchestration | Deterministic coordinator and specialist report classes |
+| Optional language model | OpenRouter briefing enhancement with numeric grounding guard |
 | Data | Versioned JSON fixtures and cache files |
 | Testing | unittest-compatible tests run with pytest |
 | Automation | GitHub Actions |

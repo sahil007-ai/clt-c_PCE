@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 
+from agent.tracing import traceable
+
 
 NUMBER_PATTERN = re.compile(r"(?<![A-Za-z-])\d+(?:\.\d+)?")
 
@@ -20,5 +22,6 @@ def ungrounded_numbers(text: str, facts: Iterable[str | int | float]) -> list[st
     return [token for token in NUMBER_PATTERN.findall(text) if _normalise(token) not in known]
 
 
+@traceable(name="NumericGroundingGuard", run_type="tool", tags=["safety", "grounding"])
 def verify_numeric_grounding(text: str, facts: Iterable[str | int | float]) -> bool:
     return not ungrounded_numbers(text, facts)

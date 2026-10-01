@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from agent.grounding import verify_numeric_grounding
 from agent.tools import EngineTools, ToolProposal
+from agent.tracing import traceable
 from engine.schemas import ObjectiveWeights, PlanningInput
 
 
@@ -37,6 +38,7 @@ def _selection_score(proposal: ToolProposal, weights: ObjectiveWeights, minima: 
     )
 
 
+@traceable(name="VoltAI_CoordinatorPlan", run_type="chain", tags=["voltai", "coordinator", "proposals"])
 def coordinate_plan(
     planning_input: PlanningInput,
     weights: ObjectiveWeights | None = None,

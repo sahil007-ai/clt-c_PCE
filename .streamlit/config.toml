@@ -1,5 +1,68 @@
 [theme]
-primaryColor = "#0ea5e9"
-backgroundColor = "#0f172a"
-secondaryBackgroundColor = "#1e293b"
-textColor = "#f8fafc"
+base = "light"
+primaryColor = "#4B6043"
+backgroundColor = "#F8F9FA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#2D3748"
+borderColor = "#E2E8F0"
+baseRadius = "12px"
+buttonRadius = "8px"
+showWidgetBorder = true
+showSidebarBorder = true
+
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+headingFont = "Outfit:https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap"
+
+greenColor = "#38A169"
+greenBackgroundColor = "#F0FFF4"
+yellowColor = "#D69E2E"
+yellowBackgroundColor = "#FEFCBF"
+redColor = "#E53E3E"
+redBackgroundColor = "#FFF5F5"
+blueColor = "#3182CE"
+blueBackgroundColor = "#EBF8FF"
+grayColor = "#718096"
+
+chartCategoricalColors = ["#4B6043", "#D69E2E", "#3182CE", "#38A169", "#718096", "#E53E3E", "#4A5568"]
+
+[theme.sidebar]
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8F9FA"
+textColor = "#2D3748"
+borderColor = "#E2E8F0"
+primaryColor = "#4B6043"
+
+[theme.light]
+primaryColor = "#4B6043"
+backgroundColor = "#F8F9FA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#2D3748"
+borderColor = "#E2E8F0"
+chartCategoricalColors = ["#4B6043", "#D69E2E", "#3182CE", "#38A169", "#718096", "#E53E3E", "#4A5568"]
+
+[theme.light.sidebar]
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8F9FA"
+textColor = "#2D3748"
+borderColor = "#E2E8F0"
+primaryColor = "#4B6043"
+
+[theme.dark]
+primaryColor = "#688B5E"
+backgroundColor = "#1A202C"
+secondaryBackgroundColor = "#2D3748"
+textColor = "#F7FAFC"
+borderColor = "#374151"
+greenColor = "#48BB78"
+yellowColor = "#ECC94B"
+redColor = "#F56565"
+blueColor = "#63B3ED"
+grayColor = "#A0AEC0"
+chartCategoricalColors = ["#688B5E", "#ECC94B", "#63B3ED", "#48BB78", "#A0AEC0", "#F56565", "#CBD5E0"]
+
+[theme.dark.sidebar]
+backgroundColor = "#2D3748"
+secondaryBackgroundColor = "#1A202C"
+textColor = "#F7FAFC"
+borderColor = "#374151"
+primaryColor = "#688B5E"
