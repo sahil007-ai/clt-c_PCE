@@ -120,7 +120,7 @@ with left:
     )
     st.altair_chart(
         alt.layer(load, tariff).resolve_scale(y="independent").properties(height=340),
-        use_container_width=True,
+        width="stretch",
     )
 
 with right:
@@ -135,7 +135,7 @@ with right:
         }
         for proposal in result.proposals
     ]
-    st.dataframe(pd.DataFrame(proposal_rows), hide_index=True, use_container_width=True)
+    st.dataframe(pd.DataFrame(proposal_rows), hide_index=True, width="stretch")
     st.info(
         f"Selected: **{selected.name.title()}**. Numeric explanation grounding: "
         f"{'passed' if result.explanation_is_grounded else 'blocked'}."
@@ -161,7 +161,7 @@ for vehicle in active_input.vehicles:
 st.dataframe(
     pd.DataFrame(vehicle_rows),
     hide_index=True,
-    use_container_width=True,
+    width="stretch",
     column_config={
         "SOC": st.column_config.ProgressColumn("SOC (%)", min_value=0, max_value=100, format="%.0f%%"),
         "SOH": st.column_config.ProgressColumn("SOH (%)", min_value=0, max_value=100, format="%.0f%%"),
