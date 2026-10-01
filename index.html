@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltAI - AI Energy & EV Fleet Optimization System</title>
+  <title>Fleet Management - EV Fleet Optimization System</title>
 
   <!-- Google Fonts: Outfit for modern headers, Inter for crisp legibility -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,124 +15,119 @@
 
   <style>
     /* ==========================================================================
-       1. DESIGN SYSTEM & DUAL-THEME COLOR TOKENS (DEFAULT: LIGHT, DATA-THEME: DARK)
+       1. DESIGN SYSTEM & DUAL-THEME COLOR TOKENS (MINIMALIST OFF-WHITE & MUTED OLIVE)
        ========================================================================== */
     :root {
-      /* LIGHT THEME (DEFAULT) */
-      --bg-main: #F7F9FB;
+      /* LIGHT MINIMALIST THEME (DEFAULT - Notion / Pinterest Aesthetic) */
+      --bg-main: #F8F9FA;
       --bg-header: #FFFFFF;
       --bg-card: #FFFFFF;
-      --bg-card-elevated: #F8FAFC;
-      --bg-card-hover: #F1F5F9;
-      --bg-input: #FFFFFF;
-      --bg-table-header: #F7F9FB;
+      --bg-card-elevated: #F1F3F5;
+      --bg-card-hover: #F8FAFC;
+      --bg-input: #F8F9FA;
+      --bg-table-header: #F1F3F5;
 
-      /* Primary Brand & Accent Palette */
-      --primary-green: #168C5B;
-      --primary-green-light: #E7F7EF;
-      --primary-green-dark: #0E7047;
+      /* Primary Muted Olive Green & Slate Palette */
+      --primary-green: #4B6043;
+      --primary-green-light: #EBF0EC;
+      --primary-green-dark: #374832;
 
-      --secondary-blue: #249BD7;
-      --secondary-blue-light: #E8F6FC;
+      --secondary-blue: #4A5568;
+      --secondary-blue-light: #EDF2F7;
 
-      --accent-cyan: #28C7C1;
-      --accent-cyan-light: #E7FAF9;
-      --accent-purple: #8B5CF6;
-      --accent-v2g: #8B5CF6;
+      --accent-cyan: #4B6043;         /* Muted Olive for primary active controls */
+      --accent-cyan-light: #EBF0EC;
+      --accent-purple: #718096;
+      --accent-v2g: #718096;
 
       /* Status Palette */
-      --status-green: #16A765;
-      --status-green-bg: #E8F7EF;
+      --status-green: #38A169;
+      --status-green-bg: #F0FFF4;
 
-      --status-yellow: #F4A340;
-      --status-yellow-bg: #FFF4E5;
+      --status-yellow: #D69E2E;
+      --status-yellow-bg: #FEFCBF;
 
-      --status-red: #E74C3C;
-      --status-red-bg: #FDECEA;
+      --status-red: #E53E3E;
+      --status-red-bg: #FFF5F5;
 
-      --status-info: #249BD7;
-      --status-info-bg: #E8F6FC;
+      --status-info: #3182CE;
+      --status-info-bg: #EBF8FF;
 
-      /* Typography Tokens */
-      --text-main: #1F2937;
-      --text-secondary: #64748B;
-      --text-muted: #94A3B8;
-      --text-disabled: #CBD5E1;
+      /* Typography Tokens - Dark Charcoal & Slate */
+      --text-main: #2D3748;
+      --text-secondary: #4A5568;
+      --text-muted: #718096;
+      --text-disabled: #A0AEC0;
 
       /* Borders & Dividers */
-      --border-color: #E5E7EB;
-      --border-light: #EEF1F4;
-      --border-active: #249BD7;
-      --border-divider: #EEF1F4;
+      --border-color: #E2E8F0;
+      --border-light: #EDF2F7;
+      --border-active: #4B6043;
+      --border-divider: #E2E8F0;
 
       /* Chart Tokens */
-      --chart-grid: #EEF1F4;
-      --chart-axis: #64748B;
+      --chart-grid: #E2E8F0;
+      --chart-axis: #718096;
       --chart-tooltip-bg: #FFFFFF;
-      --chart-tooltip-border: #E5E7EB;
-      --chart-tooltip-text: #1F2937;
+      --chart-tooltip-border: #E2E8F0;
+      --chart-tooltip-text: #2D3748;
 
       /* Radii & Smooth Theme Transitions */
       --radius-sm: 8px;
-      --radius-md: 14px;
+      --radius-md: 12px;
       --radius-lg: 16px;
       --transition-smooth: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     [data-theme="dark"] {
-      /* DARK THEME COLORS */
-      --bg-main: #0B1220;
-      --bg-header: #0F172A;
-      --bg-card: #151F2E;
-      --bg-card-elevated: #1B293A;
-      --bg-card-hover: #1B293A;
-      --bg-input: #151F2E;
-      --bg-table-header: #111827;
+      /* DARK MINIMALIST CHARCOAL THEME */
+      --bg-main: #1A202C;
+      --bg-header: #2D3748;
+      --bg-card: #2D3748;
+      --bg-card-elevated: #374151;
+      --bg-card-hover: #374151;
+      --bg-input: #2D3748;
+      --bg-table-header: #1A202C;
 
-      /* Primary Brand & Accent Palette */
-      --primary-green: #29B878;
-      --primary-green-light: #143B2B;
-      --primary-green-dark: #3DD692;
+      --primary-green: #688B5E;
+      --primary-green-light: #233320;
+      --primary-green-dark: #82A977;
 
-      --secondary-blue: #35A9E0;
-      --secondary-blue-light: #102E3D;
+      --secondary-blue: #CBD5E0;
+      --secondary-blue-light: #2D3748;
 
-      --accent-cyan: #2DD4BF;
-      --accent-cyan-light: #123936;
-      --accent-purple: #8B5CF6;
-      --accent-v2g: #8B5CF6;
+      --accent-cyan: #688B5E;
+      --accent-cyan-light: #233320;
+      --accent-purple: #A0AEC0;
+      --accent-v2g: #A0AEC0;
 
-      /* Status Palette */
-      --status-green: #2CCB82;
-      --status-green-bg: #123727;
+      --status-green: #48BB78;
+      --status-green-bg: #1C3326;
 
-      --status-yellow: #F6B84B;
-      --status-yellow-bg: #3A2C13;
+      --status-yellow: #ECC94B;
+      --status-yellow-bg: #3D3418;
 
-      --status-red: #F05B50;
-      --status-red-bg: #3A1917;
+      --status-red: #F56565;
+      --status-red-bg: #3D1C1C;
 
-      --status-info: #35A9E0;
-      --status-info-bg: #102E3D;
+      --status-info: #63B3ED;
+      --status-info-bg: #1C2D42;
 
-      /* Typography Tokens */
-      --text-main: #F8FAFC;
-      --text-secondary: #B7C2D0;
-      --text-muted: #718096;
-      --text-disabled: #4A5568;
+      --text-main: #F7FAFC;
+      --text-secondary: #E2E8F0;
+      --text-muted: #A0AEC0;
+      --text-disabled: #718096;
 
-      /* Borders & Dividers */
-      --border-color: #263445;
-      --border-light: #1D2938;
-      --border-active: #35A9E0;
-      --border-divider: #1D2938;
+      --border-color: #4A5568;
+      --border-light: #374151;
+      --border-active: #688B5E;
+      --border-divider: #374151;
 
-      /* Chart Tokens */
-      --chart-grid: #263445;
-      --chart-axis: #B7C2D0;
-      --chart-tooltip-bg: #151F2E;
-      --chart-tooltip-border: #263445;
-      --chart-tooltip-text: #F8FAFC;
+      --chart-grid: #4A5568;
+      --chart-axis: #A0AEC0;
+      --chart-tooltip-bg: #2D3748;
+      --chart-tooltip-border: #4A5568;
+      --chart-tooltip-text: #F7FAFC;
     }
 
     * {
@@ -157,16 +152,17 @@
     }
 
     /* ==========================================================================
-       2. HEADER, TOGGLE & CONTROL BAR
+       2. HEADER, LOGO INTEGRATION & TOP CONTROL BAR
        ========================================================================== */
     header {
       background: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
+      padding: 0.85rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
       transition: var(--transition-smooth);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
     .header-container {
@@ -182,34 +178,23 @@
     .logo-group {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 1rem;
     }
 
-    .logo-icon {
-      width: 40px;
+    /* Minimalist Logo Image Styling */
+    .header-logo-img {
       height: 40px;
-      background: var(--primary-green);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      color: #FFFFFF;
-      box-shadow: 0 2px 8px rgba(22, 140, 91, 0.2);
-    }
-
-    .logo-text {
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
+      width: auto;
+      object-fit: contain;
+      vertical-align: middle;
+      filter: contrast(105%);
     }
 
     /* Interactive Grid Status Toggle Pill */
     .grid-toggle-pill {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(22, 167, 101, 0.3);
+      border: 1px solid rgba(56, 161, 105, 0.3);
       padding: 0.3rem 0.75rem;
       border-radius: 20px;
       font-size: 0.75rem;
@@ -229,7 +214,7 @@
     .grid-toggle-pill.disconnected {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border-color: rgba(231, 76, 60, 0.35);
+      border-color: rgba(229, 62, 62, 0.35);
     }
 
     .pulse-dot {
@@ -251,7 +236,7 @@
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
-    /* Light/Dark Theme Switcher Toggle Button */
+    /* Light/Dark Mode Switcher Toggle Button */
     .theme-toggle-btn {
       background: var(--bg-card-elevated);
       border: 1px solid var(--border-color);
@@ -266,7 +251,7 @@
       cursor: pointer;
       user-select: none;
       transition: var(--transition-smooth);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .theme-toggle-btn:hover {
@@ -274,7 +259,7 @@
       background: var(--bg-card-hover);
     }
 
-    /* Header Global Stats Navigation */
+    /* Maintained Top Right Header Global Stats Navigation */
     nav.nav-stats {
       display: flex;
       align-items: center;
@@ -303,7 +288,7 @@
     }
 
     /* ==========================================================================
-       3. MAIN LAYOUT & STAT CARDS
+       3. MAIN LAYOUT & MINIMALIST CARD STYLING
        ========================================================================== */
     main {
       max-width: 1600px;
@@ -331,12 +316,12 @@
       justify-content: space-between;
       align-items: center;
       transition: var(--transition-smooth);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
     .kpi-card:hover {
       background: var(--bg-card-hover);
-      border-color: var(--border-light);
+      border-color: var(--border-active);
       transform: translateY(-2px);
     }
 
@@ -395,7 +380,7 @@
       gap: 1.5rem;
     }
 
-    /* Generic Card Shell */
+    /* Generic Minimalist Card Shell */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -405,7 +390,7 @@
       flex-direction: column;
       gap: 1.25rem;
       transition: var(--transition-smooth);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
     .card-header {
@@ -595,19 +580,19 @@
     .status-badge.healthy {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(22, 167, 101, 0.3);
+      border: 1px solid rgba(56, 161, 105, 0.3);
     }
 
     .status-badge.warning {
       background: var(--status-yellow-bg);
       color: var(--status-yellow);
-      border: 1px solid rgba(244, 163, 64, 0.3);
+      border: 1px solid rgba(214, 158, 46, 0.3);
     }
 
     .status-badge.critical {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border: 1px solid rgba(231, 76, 60, 0.3);
+      border: 1px solid rgba(229, 62, 62, 0.3);
     }
 
     /* ==========================================================================
@@ -651,7 +636,7 @@
       font-size: 0.85rem;
       font-weight: 700;
       color: var(--primary-green);
-      background: var(--status-green-bg);
+      background: var(--primary-green-light);
       padding: 0.15rem 0.5rem;
       border-radius: 6px;
     }
@@ -735,9 +720,9 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: var(--status-green-bg);
+      background: var(--primary-green-light);
       color: var(--primary-green);
-      border: 1px solid rgba(22, 167, 101, 0.3);
+      border: 1px solid rgba(75, 96, 67, 0.3);
       padding: 0.25rem 0.65rem;
       border-radius: 20px;
       font-size: 0.725rem;
@@ -818,7 +803,7 @@
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       font-size: 0.95rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       gap: 0.6rem;
@@ -857,16 +842,14 @@
   </div>
 
   <!-- ==========================================================================
-       HEADER & TOP CONTROLS WITH THEME TOGGLE
+       HEADER: Logo Integration (logo.png) + Minimalist Theme Toggle & Global Stats
        ========================================================================== -->
   <header>
     <div class="header-container">
       <div class="logo-group">
-        <div class="logo-icon">⚡</div>
-        <div>
-          <div class="logo-text">VoltAI Optimization</div>
-          <div style="font-size: 0.7rem; color: var(--text-muted);">AI Energy & EV Fleet Controller</div>
-        </div>
+        <!-- New Logo Integration: logo.png (Alt: Fleet Management Minimalist Logo) -->
+        <img src="logo.png" alt="Fleet Management Minimalist Logo" class="header-logo-img" onError="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        <span style="display:none; font-family:'Outfit'; font-weight:800; font-size:1.2rem; color:var(--text-main);">FLEET MANAGEMENT</span>
 
         <!-- Interactive Grid Status Toggle Pill -->
         <div id="gridStatusPill" class="grid-toggle-pill" onclick="toggleGridStatus()" title="Click to toggle Grid Connection status">
@@ -874,7 +857,7 @@
           <span id="gridStatusText">GRID SYNCHRONIZED</span>
         </div>
 
-        <!-- Light / Dark Mode Toggle Button -->
+        <!-- Light/Dark Mode Toggle Button -->
         <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
           <span id="themeToggleIcon">☀️</span>
           <span id="themeToggleText">Light</span>
@@ -918,10 +901,10 @@
       <div class="kpi-card">
         <div class="kpi-info">
           <span class="kpi-title">Scheduled Net Load</span>
-          <span class="kpi-num" id="kpiNetLoad" style="color: var(--accent-cyan);">180 kW</span>
+          <span class="kpi-num" id="kpiNetLoad" style="color: var(--primary-green);">180 kW</span>
           <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-v2g);">Includes -80 kW V2G Feed-In</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--accent-cyan-light); color: var(--accent-cyan);">⚡</div>
+        <div class="kpi-icon-box" style="background: var(--primary-green-light); color: var(--primary-green);">⚡</div>
       </div>
 
       <div class="kpi-card">
@@ -939,7 +922,7 @@
           <span class="kpi-num" style="color: var(--accent-v2g);">$340.00</span>
           <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">🔄</div>
+        <div class="kpi-icon-box" style="background: rgba(113, 128, 150, 0.12); color: var(--text-secondary);">🔄</div>
       </div>
     </section>
 
@@ -961,7 +944,7 @@
             </div>
             <!-- Legend Badges -->
             <div class="chart-legend-badge">
-              <div class="legend-item"><span class="legend-box" style="background: var(--accent-cyan);"></span> Charge (+kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--primary-green);"></span> Charge (+kW)</div>
               <div class="legend-item"><span class="legend-box" style="background: var(--accent-purple);"></span> V2G Discharging (-kW)</div>
               <div class="legend-item"><span class="legend-box" style="background: var(--status-yellow);"></span> Grid Rate ($/kWh)</div>
             </div>
@@ -1047,7 +1030,7 @@
             <div class="slider-item">
               <div class="slider-header">
                 <span class="slider-label">Battery Longevity Protection</span>
-                <span class="slider-value-display" id="longevityValDisplay" style="color: var(--primary-green); background: var(--status-green-bg);">30%</span>
+                <span class="slider-value-display" id="longevityValDisplay">30%</span>
               </div>
               <input type="range" id="longevitySlider" min="0" max="100" value="30" step="5" oninput="handleSliderChange('longevity')">
               <div style="font-size: 0.7rem; color: var(--text-muted);">
@@ -1103,13 +1086,13 @@
 
   <footer>
     <div style="max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>VoltAI Energy & EV Fleet Optimization System &copy; 2026</div>
+      <div>Fleet Management EV Optimization System &copy; 2026</div>
       <div style="color: var(--primary-green); font-weight: 600;">System Status: Operational</div>
     </div>
   </footer>
 
   <!-- ==========================================================================
-       JAVASCRIPT ENGINE & LOGIC (WITH THEME SYSTEM MANAGER)
+       JAVASCRIPT ENGINE & LOGIC (WITH THEME SYSTEM MANAGER & LOGO HANDLING)
        ========================================================================== */
   -->
   <script>
@@ -1152,7 +1135,7 @@
     const toastMessage = document.getElementById('toastMessage');
 
     /* ==========================================================================
-       C. DUAL THEME MANAGER (LIGHT DEFAULT / DARK PERSISTENT)
+       C. DUAL THEME MANAGER (MINIMALIST LIGHT DEFAULT / DARK PERSISTENT)
        ========================================================================== */
     function initTheme() {
       const savedTheme = localStorage.getItem('voltai_theme') || 'light';
@@ -1183,17 +1166,17 @@
       if (typeof chargingPricingChart === 'undefined' || !chargingPricingChart) return;
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-      const gridColor = isDark ? '#263445' : '#EEF1F4';
-      const labelColor = isDark ? '#B7C2D0' : '#64748B';
-      const tooltipBg = isDark ? '#151F2E' : '#FFFFFF';
-      const tooltipBorder = isDark ? '#263445' : '#E5E7EB';
-      const tooltipText = isDark ? '#F8FAFC' : '#1F2937';
+      const gridColor = isDark ? '#4A5568' : '#E2E8F0';
+      const labelColor = isDark ? '#A0AEC0' : '#718096';
+      const tooltipBg = isDark ? '#2D3748' : '#FFFFFF';
+      const tooltipBorder = isDark ? '#4A5568' : '#E2E8F0';
+      const tooltipText = isDark ? '#F7FAFC' : '#2D3748';
 
       chargingPricingChart.options.scales.x.grid.color = gridColor;
       chargingPricingChart.options.scales.x.ticks.color = labelColor;
       chargingPricingChart.options.scales.yPrice.grid.color = gridColor;
-      chargingPricingChart.options.scales.yPrice.ticks.color = isDark ? '#F6B84B' : '#F4A340';
-      chargingPricingChart.options.scales.yLoad.ticks.color = isDark ? '#2DD4BF' : '#28C7C1';
+      chargingPricingChart.options.scales.yPrice.ticks.color = isDark ? '#ECC94B' : '#D69E2E';
+      chargingPricingChart.options.scales.yLoad.ticks.color = isDark ? '#688B5E' : '#4B6043';
       chargingPricingChart.options.plugins.tooltip.backgroundColor = tooltipBg;
       chargingPricingChart.options.plugins.tooltip.borderColor = tooltipBorder;
       chargingPricingChart.options.plugins.tooltip.titleColor = tooltipText;
@@ -1274,12 +1257,12 @@
           ctx.beginPath();
           ctx.setLineDash([5, 5]);
           ctx.lineWidth = 2;
-          ctx.strokeStyle = '#E74C3C';
+          ctx.strokeStyle = '#E53E3E';
           ctx.moveTo(x, topY);
           ctx.lineTo(x, bottomY);
           ctx.stroke();
 
-          ctx.fillStyle = '#E74C3C';
+          ctx.fillStyle = '#E53E3E';
           ctx.font = 'bold 10px Inter';
           ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
           ctx.restore();
@@ -1297,8 +1280,8 @@
             type: 'line',
             label: 'Grid Price ($/kWh)',
             data: electricityPrices,
-            borderColor: '#F4A340',
-            backgroundColor: 'rgba(244, 163, 64, 0.12)',
+            borderColor: '#D69E2E',
+            backgroundColor: 'rgba(214, 158, 46, 0.12)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
@@ -1312,13 +1295,13 @@
             backgroundColor: function(context) {
               const val = context.raw;
               const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-              const cyanColor = isDark ? 'rgba(45, 212, 191, 0.75)' : 'rgba(40, 199, 193, 0.75)';
-              return val < 0 ? 'rgba(139, 92, 246, 0.85)' : cyanColor;
+              const oliveColor = isDark ? 'rgba(104, 139, 94, 0.85)' : 'rgba(75, 96, 67, 0.85)';
+              return val < 0 ? 'rgba(113, 128, 150, 0.85)' : oliveColor;
             },
             borderColor: function(context) {
               const val = context.raw;
               const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-              return val < 0 ? '#8B5CF6' : (isDark ? '#2DD4BF' : '#28C7C1');
+              return val < 0 ? '#718096' : (isDark ? '#688B5E' : '#4B6043');
             },
             borderWidth: 1,
             borderRadius: 4,
@@ -1335,9 +1318,9 @@
           legend: { display: false },
           tooltip: {
             backgroundColor: '#FFFFFF',
-            titleColor: '#1F2937',
-            bodyColor: '#64748B',
-            borderColor: '#E5E7EB',
+            titleColor: '#2D3748',
+            bodyColor: '#4A5568',
+            borderColor: '#E2E8F0',
             borderWidth: 1,
             callbacks: {
               label: function(context) {
@@ -1352,25 +1335,25 @@
         },
         scales: {
           x: {
-            grid: { color: '#EEF1F4' },
-            ticks: { color: '#64748B', font: { family: 'Inter', size: 10 } }
+            grid: { color: '#E2E8F0' },
+            ticks: { color: '#718096', font: { family: 'Inter', size: 10 } }
           },
           yPrice: {
             type: 'linear',
             position: 'left',
-            title: { display: true, text: 'Grid Price ($/kWh)', color: '#F4A340', font: { weight: 'bold' } },
-            grid: { color: '#EEF1F4' },
-            ticks: { color: '#F4A340', callback: (v) => '$' + v.toFixed(2) }
+            title: { display: true, text: 'Grid Price ($/kWh)', color: '#D69E2E', font: { weight: 'bold' } },
+            grid: { color: '#E2E8F0' },
+            ticks: { color: '#D69E2E', callback: (v) => '$' + v.toFixed(2) }
           },
           yLoad: {
             type: 'linear',
             position: 'right',
-            title: { display: true, text: 'Scheduled Load (kW)', color: '#28C7C1', font: { weight: 'bold' } },
+            title: { display: true, text: 'Scheduled Load (kW)', color: '#4B6043', font: { weight: 'bold' } },
             min: -120,
             max: 300,
             grid: { drawOnChartArea: false },
             ticks: {
-              color: '#28C7C1',
+              color: '#4B6043',
               callback: (v) => v < 0 ? v + ' kW (V2G)' : v + ' kW'
             }
           }
@@ -1423,7 +1406,7 @@
       let recText = '';
 
       if (!isGridConnected) {
-        recText = `<strong>⚠️ GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. VoltAI has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
+        recText = `<strong>⚠️ GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. Fleet Management system has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
       } else if (costWeight >= 50) {
         recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With <strong>Strategy: Cost Minimization - ${costWeight}%</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, generating <strong>$340.00</strong> in V2G revenues and yielding <strong>$${calculatedSavings}.00</strong> in projected nightly savings.`;
       } else {
