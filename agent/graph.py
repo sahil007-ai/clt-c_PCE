@@ -18,6 +18,7 @@ SPECIALIST_WEIGHTS = {
 
 @dataclass(frozen=True)
 class CoordinationResult:
+    planning_input: PlanningInput
     proposals: tuple[ToolProposal, ...]
     selected: ToolProposal
     explanation: str
@@ -81,6 +82,7 @@ def coordinate_plan(
             "The verifier rejected it, so the coordinator requires an operator decision before approval."
         )
     return CoordinationResult(
+        planning_input=tools.planning_input,
         proposals=tuple(proposals),
         selected=selected,
         explanation=explanation,

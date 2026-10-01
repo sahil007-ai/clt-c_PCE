@@ -1,329 +1,189 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import altair as alt
+"""VoltAI Streamlit dashboard backed exclusively by verified engine output."""
 
-# ==============================================================================
-# 1. STREAMLIT PAGE CONFIGURATION & CUSTOM STYLING
-# Wide layout, custom theme configured in .streamlit/config.toml
-# ==============================================================================
+from __future__ import annotations
+
+import altair as alt
+import pandas as pd
+import streamlit as st
+
+from agent.graph import coordinate_plan
+from agent.tools import record_approval
+from engine.energy import calculate_all_energy_needs
+from engine.generate import PROJECT_ROOT, load_planning_input
+from engine.schemas import ObjectiveWeights
+
+
 st.set_page_config(
-    page_title="VoltAI - AI Energy & EV Fleet Optimization System",
+    page_title="VoltAI — Verified EV Fleet Planning",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
-# Custom Theme CSS Adjustments
-st.markdown("""
-<style>
-    /* Metric Card Custom Styling */
-    .metric-card {
-        background: #1e293b;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-        transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .metric-card:hover {
-        transform: translateY(-2px);
-        border-color: #0ea5e9;
-    }
-    .metric-label {
-        font-size: 0.8rem;
-        color: #94a3b8;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .metric-value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: #f8fafc;
-        margin: 0.2rem 0;
-    }
-    .metric-sub {
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
 
-    /* AI Action Center Recommendation Box */
-    .ai-callout {
-        background: linear-gradient(145deg, #1e293b, #0f172a);
-        border-left: 4px solid #0ea5e9;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-    }
-    .ai-badge {
-        display: inline-block;
-        background: rgba(14, 165, 233, 0.15);
-        color: #0ea5e9;
-        border: 1px solid rgba(14, 165, 233, 0.3);
-        padding: 0.2rem 0.6rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-    }
-    .ai-text {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        color: #e2e8f0;
-    }
-</style>
-""", unsafe_allow_html=True)
+EVENTS: dict[str, dict | None] = {
+    "Normal planning run": None,
+    "Charger failure (slots 12–17)": {
+        "type": "charger_failure",
+        "start_slot": 12,
+        "end_slot": 18,
+        "unavailable_chargers": 1,
+    },
+    "Late return (EV-103)": {"type": "late_return", "vehicle_id": "EV-103", "return_slot": 10},
+    "Price spike (slots 16–19)": {"type": "price_spike", "start_slot": 16, "end_slot": 20, "price": 12.0},
+    "Missing battery reading": {"type": "missing_battery_data"},
+}
 
-# ==============================================================================
-# 2. SIDEBAR CONTROLS & MULTI-OBJECTIVE WEIGHT SLIDERS
-# ==============================================================================
-st.sidebar.markdown("## ⚙️ AI Optimization Parameters")
-st.sidebar.markdown("Tune multi-objective weights to alter fleet charging strategy:")
 
-cost_weight = st.sidebar.slider(
-    "Cost Minimization Weight (%)",
-    min_value=0, max_value=100, value=80, step=5,
-    help="Prioritizes charging during cheap off-peak grid rate hours."
-)
+def slot_label(slot: int, slot_minutes: int = 30) -> str:
+    minutes = slot * slot_minutes
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
 
-longevity_weight = st.sidebar.slider(
-    "Battery Longevity Protection (%)",
-    min_value=0, max_value=100, value=70, step=5,
-    help="Caps fast-charging thermal stress and limits degradation."
-)
 
-turnaround_weight = st.sidebar.slider(
-    "Fleet Turnaround Priority (%)",
-    min_value=0, max_value=100, value=40, step=5,
-    help="Prioritizes rapid charging to ensure route readiness."
-)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("## 🚗 Fleet Telematics Filters")
-min_soc = st.sidebar.slider(
-    "Minimum SOC (%)",
-    min_value=0, max_value=100, value=0, step=5,
-    help="Filter vehicle telematics table by minimum State of Charge percentage."
-)
-
-# ==============================================================================
-# 3. HEADER & TOP KPI METRICS
-# ==============================================================================
-st.title("⚡ VoltAI - AI Energy & EV Fleet Optimization System")
-st.markdown("Real-time grid pricing load-shaping, battery telematics, and AI schedule control.")
-
-# Top KPI Metric Cards Grid
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-
-with kpi1:
-    st.markdown("""
-        <div class="metric-card">
-            <div class="metric-label">Total Fleet Size</div>
-            <div class="metric-value">42 EVs</div>
-            <div class="metric-sub" style="color: #10b981;">● 8 Monitored Vehicles</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-with kpi2:
-    st.markdown("""
-        <div class="metric-card">
-            <div class="metric-label">Current Grid Rate</div>
-            <div class="metric-value" style="color: #f59e0b;">$0.48 / kWh</div>
-            <div class="metric-sub" style="color: #f59e0b;">⚠️ Peak Pricing Window</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-with kpi3:
-    st.markdown("""
-        <div class="metric-card">
-            <div class="metric-label">Fleet Avg SOC</div>
-            <div class="metric-value" style="color: #0ea5e9;">64%</div>
-            <div class="metric-sub" style="color: #10b981;">↑ +3.8% vs last hour</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-with kpi4:
-    st.markdown("""
-        <div class="metric-card">
-            <div class="metric-label">Projected Daily Cost</div>
-            <div class="metric-value" style="color: #6366f1;">$1,280.50</div>
-            <div class="metric-sub" style="color: #10b981;">↓ $385.00 AI Saved Today</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ==============================================================================
-# 4. MAIN DASHBOARD CONTENT: TELEMATICS TABLE & ALTAIR CHART
-# ==============================================================================
-col_left, col_right = st.columns([1.15, 1])
-
-# --- LEFT COLUMN: EV Telematics Data Table ---
-with col_left:
-    st.subheader("🚘 Live EV Telematics & Battery Health")
-
-    # CRITICAL DATA FIX: Whole integers between 15 and 95 for SOC (%) and SOH (%)
-    raw_telematics_data = [
-        {"Vehicle ID": "EV-101", "Route": "Route 12 - Downtown Express", "SOC (%)": 35, "SOH (%)": 94, "Status": "Charging"},
-        {"Vehicle ID": "EV-102", "Route": "Route 05 - Airport Shuttle",  "SOC (%)": 82, "SOH (%)": 98, "Status": "Ready / Standby"},
-        {"Vehicle ID": "EV-103", "Route": "Route 08 - Metro North",     "SOC (%)": 18, "SOH (%)": 86, "Status": "Critical / Low SOC"},
-        {"Vehicle ID": "EV-104", "Route": "Route 14 - Logistics Hub",    "SOC (%)": 65, "SOH (%)": 91, "Status": "Charging"},
-        {"Vehicle ID": "EV-105", "Route": "Route 03 - Service Patrol",   "SOC (%)": 45, "SOH (%)": 88, "Status": "Throttled"},
-        {"Vehicle ID": "EV-106", "Route": "Route 09 - Suburb Loop",      "SOC (%)": 92, "SOH (%)": 96, "Status": "Ready / Standby"},
-        {"Vehicle ID": "EV-107", "Route": "Route 21 - Industrial Zone",  "SOC (%)": 28, "SOH (%)": 84, "Status": "Throttled"},
-        {"Vehicle ID": "EV-108", "Route": "Route 04 - Cargo Depot",      "SOC (%)": 76, "SOH (%)": 93, "Status": "Charging"}
-    ]
-
-    df_telematics = pd.DataFrame(raw_telematics_data)
-
-    # Filter dataframe by Minimum SOC (%) integer slider
-    filtered_df = df_telematics[df_telematics["SOC (%)"] >= min_soc].copy()
-
-    # Streamlit Dataframe with Progress Columns for SOC (%) and SOH (%)
-    st.dataframe(
-        filtered_df,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Vehicle ID": st.column_config.TextColumn("Vehicle ID", help="Unique EV Identifier"),
-            "Route": st.column_config.TextColumn("Assigned Route"),
-            "SOC (%)": st.column_config.ProgressColumn(
-                "SOC (%)",
-                help="State of Charge Percentage (0-100%)",
-                format="%d%%",
-                min_value=0,
-                max_value=100,
-            ),
-            "SOH (%)": st.column_config.ProgressColumn(
-                "SOH (%)",
-                help="State of Health Percentage (0-100%)",
-                format="%d%%",
-                min_value=0,
-                max_value=100,
-            ),
-            "Status": st.column_config.TextColumn("Vehicle Status")
+def schedule_chart_data(planning_input, schedule) -> pd.DataFrame:
+    load_by_slot = {slot: 0.0 for slot in range(planning_input.chargers.horizon_slots)}
+    for assignment in schedule.assignments:
+        load_by_slot[assignment.slot] += assignment.energy_kwh / (
+            planning_input.chargers.slot_minutes / 60
+        )
+    return pd.DataFrame(
+        {
+            "Time": [slot_label(slot, planning_input.chargers.slot_minutes) for slot in load_by_slot],
+            "Charging load (kW)": list(load_by_slot.values()),
+            "Tariff (INR/kWh)": list(planning_input.tariff.slot_prices),
         }
     )
 
-    if filtered_df.empty:
-        st.info(f"No EV vehicles match the current Minimum SOC filter of {min_soc}%.")
 
+st.title("⚡ VoltAI — Verified EV Fleet Charging Plan")
+st.caption(
+    "Fixture-backed demo. The coordinator only presents schedules accepted by an independent checker; "
+    "approval is recorded locally and never controls chargers."
+)
 
-# --- RIGHT COLUMN: Altair Dual-Axis Line & Bar Chart ---
-with col_right:
-    # CRITICAL UI FIX: Clean title "Draw vs. Grid Price Forecast"
-    st.subheader("📊 Draw vs. Grid Price Forecast")
+with st.sidebar:
+    st.header("Planning priorities")
+    cost_weight = st.slider("Cost", min_value=0, max_value=100, value=60, step=5)
+    availability_weight = st.slider("Availability", min_value=0, max_value=100, value=30, step=5)
+    health_weight = st.slider("Battery health", min_value=0, max_value=100, value=10, step=5)
+    scenario_name = st.selectbox("Disruption scenario", list(EVENTS))
+    st.divider()
+    st.markdown("**Data mode:** cache-first fixture")
+    st.caption("Refreshers reject invalid data and retain the last valid cache.")
 
-    # 12-Hour Timeline Data
-    hours = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
-    grid_prices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12]
+planning_input = load_planning_input()
+weights = ObjectiveWeights(cost_weight, availability_weight, health_weight)
 
-    # Dynamic Charging Draw Logic tied to "Cost Minimization" slider
-    charging_draw = []
-    for price in grid_prices:
-        if cost_weight > 50:
-            if price >= 0.40:
-                # Drop charging draw during peak price hours
-                draw = int(250 * (1 - (cost_weight / 100)))
-            else:
-                # Shift charging draw to off-peak low price hours
-                draw = int(180 + (cost_weight * 0.8))
-        else:
-            # High charging draw even during peak hours if cost minimization is low
-            draw = 210
+try:
+    result = coordinate_plan(planning_input, weights, event=EVENTS[scenario_name])
+except ValueError as error:
+    st.error(str(error))
+    st.info("No schedule was generated because VoltAI will not guess a missing battery reading.")
+    st.stop()
 
-        charging_draw.append(max(10, draw))
+selected = result.selected
+schedule = selected.schedule
+checked = selected.check
+active_input = result.planning_input
+needs = calculate_all_energy_needs(active_input.vehicles, active_input.routes)
+ready_count = sum(value <= 0 for value in schedule.unmet_energy_kwh.values())
+total_energy = sum(schedule.delivered_energy_kwh.values())
 
-    chart_data = pd.DataFrame({
-        "Time": hours,
-        "Grid Price ($/kWh)": grid_prices,
-        "Charging Draw (kW)": charging_draw
-    })
+metric_a, metric_b, metric_c, metric_d = st.columns(4)
+metric_a.metric("Vehicles ready", f"{ready_count}/{len(active_input.vehicles)}")
+metric_b.metric("Scheduled energy", f"{total_energy:.1f} kWh")
+metric_c.metric("Verified energy cost", f"INR {checked.cost:.2f}")
+metric_d.metric("Schedule status", "Verified" if checked.valid else "Blocked")
 
-    # Altair Dual-Axis Chart Construction
-    base = alt.Chart(chart_data).encode(x=alt.X('Time:N', sort=None, title='12-Hour Forecast Window'))
-
-    # Bar Chart for Scheduled Charging Draw (kW) - Electric Blue theme (#0ea5e9)
-    bar_chart = base.mark_bar(color='#0ea5e9', opacity=0.75, cornerRadiusTopLeft=4, cornerRadiusTopRight=4).encode(
-        y=alt.Y('Charging Draw (kW):Q', title='Charging Draw (kW)', scale=alt.Scale(domain=[0, 300])),
-        tooltip=['Time', 'Charging Draw (kW)', 'Grid Price ($/kWh)']
-    )
-
-    # Line Chart for Grid Prices ($/kWh) - Warning Amber (#f59e0b)
-    line_chart = base.mark_line(color='#f59e0b', strokeWidth=3, interpolate='monotone').encode(
-        y=alt.Y('Grid Price ($/kWh):Q', title='Grid Price ($/kWh)', scale=alt.Scale(domain=[0, 0.60])),
-        tooltip=['Time', 'Grid Price ($/kWh)']
-    )
-
-    points = base.mark_point(color='#f59e0b', size=45, filled=True).encode(
-        y=alt.Y('Grid Price ($/kWh):Q')
-    )
-
-    # Combine charts with independent Y-axes
-    dual_axis_chart = alt.layer(
-        bar_chart,
-        line_chart + points
-    ).resolve_scale(
-        y='independent'
-    ).properties(
-        height=330
-    ).configure_view(
-        strokeWidth=0
-    ).configure_axis(
-        labelColor='#94a3b8',
-        titleColor='#94a3b8',
-        gridColor='rgba(255, 255, 255, 0.05)'
-    )
-
-    st.altair_chart(dual_axis_chart, use_container_width=True)
-
-# ==============================================================================
-# 5. AI ACTION CENTER & RECOMMENDATION ENGINE
-# ==============================================================================
-st.markdown("---")
-st.subheader("🤖 AI Action Center & Schedule Optimizer")
-
-# Determine dominant slider weight
-weights = {
-    "Cost Minimization": cost_weight,
-    "Battery Longevity": longevity_weight,
-    "Fleet Turnaround": turnaround_weight
-}
-dominant_strategy = max(weights, key=weights.get)
-dominant_value = weights[dominant_strategy]
-
-# Generate Dynamic AI Recommendation Text based on dominant slider
-if dominant_strategy == "Cost Minimization" and cost_weight >= 50:
-    ai_recommendation = (
-        f"Grid prices are currently peaking at **$0.52/kWh** between 16:00 and 19:00. With **Cost Minimization prioritized at {cost_weight}%**, "
-        f"the AI engine has scheduled an aggressive peak-shaving policy. Fast chargers are throttled to 15 kW during peak hours, deferring "
-        f"240 kW of load to 22:00 when grid prices plunge to **$0.12/kWh**. Projected nightly financial savings: **$425.00**."
-    )
-elif dominant_strategy == "Battery Longevity":
-    ai_recommendation = (
-        f"Telematics indicate cell temperatures of 41°C+ on EV-103 & EV-107. With **Battery Longevity Protection prioritized at {longevity_weight}%**, "
-        f"the AI engine recommends enforcing a strict 40 kW charging rate cap and limiting maximum SOC dwell time above 85%. This prevents thermal degradation "
-        f"and extends fleet battery pack lifetime by **+24%**."
-    )
+if checked.valid:
+    st.success(result.explanation)
 else:
-    ai_recommendation = (
-        f"Fleet turnaround demands are high for evening shuttles. With **Fleet Turnaround prioritized at {turnaround_weight}%**, "
-        f"the AI engine recommends overriding off-peak deferrals to supply max 180 kW fast charging to EV-101, EV-103, and EV-104. "
-        f"All units will reach 90% SOC by 18:30 for rapid route dispatch. Projected grid cost impact: **+$145.00**."
+    st.error(result.explanation)
+
+st.caption(
+    f"Tariff provenance: {result.data_status} · Source: {active_input.tariff.source} · "
+    f"Fetched: {active_input.tariff.fetched_at}"
+)
+
+left, right = st.columns([1.2, 1])
+with left:
+    st.subheader("Scheduled charging load and tariff")
+    chart_data = schedule_chart_data(active_input, schedule)
+    base = alt.Chart(chart_data).encode(x=alt.X("Time:N", sort=None, title="30-minute slot"))
+    load = base.mark_bar(color="#0ea5e9").encode(
+        y=alt.Y("Charging load (kW):Q", title="Charging load (kW)"),
+        tooltip=["Time", "Charging load (kW)", "Tariff (INR/kWh)"],
+    )
+    tariff = base.mark_line(color="#f59e0b", strokeWidth=3).encode(
+        y=alt.Y("Tariff (INR/kWh):Q", title="Tariff (INR/kWh)"),
+        tooltip=["Time", "Tariff (INR/kWh)"],
+    )
+    st.altair_chart(
+        alt.layer(load, tariff).resolve_scale(y="independent").properties(height=340),
+        use_container_width=True,
     )
 
-# Render AI Callout Card
-st.markdown(f"""
-    <div class="ai-callout">
-        <div class="ai-badge">✨ Live AI Recommendation (Strategy: {dominant_strategy} - {dominant_value}%)</div>
-        <div class="ai-text">{ai_recommendation}</div>
-    </div>
-""", unsafe_allow_html=True)
+with right:
+    st.subheader("Checked proposals")
+    proposal_rows = [
+        {
+            "Proposal": proposal.name.title(),
+            "Verified": "Yes" if proposal.check.valid else "No",
+            "Cost (INR)": proposal.check.cost,
+            "Health penalty": proposal.schedule.objective["health_penalty"],
+            "Unmet (kWh)": proposal.schedule.objective["unmet_energy_kwh"],
+        }
+        for proposal in result.proposals
+    ]
+    st.dataframe(pd.DataFrame(proposal_rows), hide_index=True, use_container_width=True)
+    st.info(
+        f"Selected: **{selected.name.title()}**. Numeric explanation grounding: "
+        f"{'passed' if result.explanation_is_grounded else 'blocked'}."
+    )
 
-# Action Accept Button
-if st.button("Accept AI Schedule", use_container_width=True, type="primary"):
-    st.success("✅ **AI Optimization Schedule Accepted!** Smart charger controllers, V2G inverters, and fleet dispatch schedules have been updated successfully.")
+st.subheader("Fleet readiness and scheduled energy")
+vehicle_rows = []
+for vehicle in active_input.vehicles:
+    need = needs[vehicle.vehicle_id]
+    delivered = schedule.delivered_energy_kwh[vehicle.vehicle_id]
+    vehicle_rows.append(
+        {
+            "Vehicle": vehicle.vehicle_id,
+            "SOC": vehicle.soc_percent,
+            "SOH": vehicle.soh_percent,
+            "Temperature (°C)": vehicle.temperature_c,
+            "Required (kWh)": need.required_charge_kwh,
+            "Scheduled (kWh)": delivered,
+            "Unmet (kWh)": schedule.unmet_energy_kwh[vehicle.vehicle_id],
+            "Status": "Ready" if schedule.unmet_energy_kwh[vehicle.vehicle_id] <= 0 else "Needs operator decision",
+        }
+    )
+st.dataframe(
+    pd.DataFrame(vehicle_rows),
+    hide_index=True,
+    use_container_width=True,
+    column_config={
+        "SOC": st.column_config.ProgressColumn("SOC (%)", min_value=0, max_value=100, format="%.0f%%"),
+        "SOH": st.column_config.ProgressColumn("SOH (%)", min_value=0, max_value=100, format="%.0f%%"),
+    },
+)
+
+if not checked.valid:
+    st.warning("Approval is disabled. Review the checker violations below and change the scenario or inputs.")
+    st.dataframe(pd.DataFrame([item.__dict__ for item in checked.violations]), hide_index=True)
+else:
+    st.subheader("Human approval")
+    operator = st.text_input("Operator name", placeholder="Required for the local approval record")
+    if st.button("Approve verified plan", type="primary", disabled=not operator.strip()):
+        destination = record_approval(
+            schedule,
+            operator=operator.strip(),
+            destination=PROJECT_ROOT / "saved_outputs" / "approvals.jsonl",
+        )
+        st.success(f"Approval recorded in {destination.name}. No charger command was sent.")
+
+st.divider()
+st.caption(
+    "Safety boundary: this application reads fixture/cache data, calculates a plan, and records explicit approval. "
+    "It does not call live charging hardware, dispatch systems, or customer systems."
+)
