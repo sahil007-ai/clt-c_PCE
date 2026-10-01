@@ -164,10 +164,28 @@ docs/                  Demo, data-provenance, and safety documentation
 | Dashboard | Streamlit, pandas, Altair |
 | Scheduling and verification | Python standard library, typed dataclasses |
 | Agent orchestration | Deterministic coordinator and specialist report classes |
+| Observability & Tracing | LangSmith `@traceable` span tracing |
 | Optional language model | OpenRouter briefing enhancement with numeric grounding guard |
 | Data | Versioned JSON fixtures and cache files |
 | Testing | unittest-compatible tests run with pytest |
 | Automation | GitHub Actions |
+
+## LangSmith Observability & Tracing
+
+VoltAI is instrumented with [LangSmith](https://smith.langchain.com) for observability across the multi-agent copilot, proposal generation, tool execution, and benchmark evaluations:
+
+- **Automatic Environment Sync**: `agent/tracing.py` reads `.env` automatically and synchronizes the supported `LANGSMITH_*` and `LANGCHAIN_*` tracing variables when credentials are present.
+- **Span Hierarchy**:
+  - `VoltAI_OperationsCopilot` (top-level workflow chain)
+    - `PlannerAgent` (fleet schedule analysis)
+    - `ScenarioAnalystAgent` (disruption response & sensitivity)
+    - `BatteryHealthReviewerAgent` (degradation & depth-of-discharge checks)
+    - `DataQualitySafetyReviewerAgent` (telematics confidence & constraint compliance)
+    - `OperatorBriefingAgent` (grounded briefings & OpenRouter Nemotron LLM enhancement)
+  - `VoltAI_CoordinatorPlan` (candidate schedule generation, scoring, and selection)
+  - `VoltAI_SeededEvaluation` (50-scenario reproducible test runner)
+  - Tool spans: `verify_numeric_grounding`, `EngineTools.propose`, `EngineTools.record_approval`
+- **Graceful Fallback**: If the LangSmith package or credentials are unavailable, the `@traceable` wrapper falls back to the original function and the application continues offline.
 
 ## Boundaries and next production work
 
