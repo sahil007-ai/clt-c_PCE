@@ -15,36 +15,119 @@
 
   <style>
     /* ==========================================================================
-       1. DESIGN SYSTEM & COLOR TOKENS
+       1. DESIGN SYSTEM & DUAL-THEME COLOR TOKENS (MINIMALIST OFF-WHITE & MUTED OLIVE)
        ========================================================================== */
     :root {
-      --bg-main: #0a0e17;
-      --bg-card: #111827;
-      --bg-card-hover: #162032;
-      --bg-input: #1f293d;
+      /* LIGHT MINIMALIST THEME (DEFAULT - Notion / Pinterest Aesthetic) */
+      --bg-main: #F8F9FA;
+      --bg-header: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-card-elevated: #F1F3F5;
+      --bg-card-hover: #F8FAFC;
+      --bg-input: #F8F9FA;
+      --bg-table-header: #F1F3F5;
 
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      /* Primary Muted Olive Green & Slate Palette */
+      --primary-green: #4B6043;
+      --primary-green-light: #EBF0EC;
+      --primary-green-dark: #374832;
 
-      --accent-cyan: #06b6d4;
-      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
-      --accent-indigo: #6366f1;
-      --accent-v2g: #818cf8;       /* Indigo for V2G Discharging */
+      --secondary-blue: #4A5568;
+      --secondary-blue-light: #EDF2F7;
 
-      /* Status Indicator Palette */
-      --status-green: #10b981;
-      --status-green-bg: rgba(16, 185, 129, 0.15);
-      --status-yellow: #f59e0b;
-      --status-yellow-bg: rgba(245, 158, 11, 0.15);
-      --status-red: #ef4444;
-      --status-red-bg: rgba(239, 68, 68, 0.15);
+      --accent-cyan: #4B6043;         /* Muted Olive for primary active controls */
+      --accent-cyan-light: #EBF0EC;
+      --accent-purple: #718096;
+      --accent-v2g: #718096;
 
-      --border-color: rgba(255, 255, 255, 0.08);
+      /* Status Palette */
+      --status-green: #38A169;
+      --status-green-bg: #F0FFF4;
+
+      --status-yellow: #D69E2E;
+      --status-yellow-bg: #FEFCBF;
+
+      --status-red: #E53E3E;
+      --status-red-bg: #FFF5F5;
+
+      --status-info: #3182CE;
+      --status-info-bg: #EBF8FF;
+
+      /* Typography Tokens - Dark Charcoal & Slate */
+      --text-main: #2D3748;
+      --text-secondary: #4A5568;
+      --text-muted: #718096;
+      --text-disabled: #A0AEC0;
+
+      /* Borders & Dividers */
+      --border-color: #E2E8F0;
+      --border-light: #EDF2F7;
+      --border-active: #4B6043;
+      --border-divider: #E2E8F0;
+
+      /* Chart Tokens */
+      --chart-grid: #E2E8F0;
+      --chart-axis: #718096;
+      --chart-tooltip-bg: #FFFFFF;
+      --chart-tooltip-border: #E2E8F0;
+      --chart-tooltip-text: #2D3748;
+
+      /* Radii & Smooth Theme Transitions */
       --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition-smooth: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+    }
+
+    [data-theme="dark"] {
+      /* DARK MINIMALIST CHARCOAL THEME */
+      --bg-main: #1A202C;
+      --bg-header: #2D3748;
+      --bg-card: #2D3748;
+      --bg-card-elevated: #374151;
+      --bg-card-hover: #374151;
+      --bg-input: #2D3748;
+      --bg-table-header: #1A202C;
+
+      --primary-green: #688B5E;
+      --primary-green-light: #233320;
+      --primary-green-dark: #82A977;
+
+      --secondary-blue: #CBD5E0;
+      --secondary-blue-light: #2D3748;
+
+      --accent-cyan: #688B5E;
+      --accent-cyan-light: #233320;
+      --accent-purple: #A0AEC0;
+      --accent-v2g: #A0AEC0;
+
+      --status-green: #48BB78;
+      --status-green-bg: #1C3326;
+
+      --status-yellow: #ECC94B;
+      --status-yellow-bg: #3D3418;
+
+      --status-red: #F56565;
+      --status-red-bg: #3D1C1C;
+
+      --status-info: #63B3ED;
+      --status-info-bg: #1C2D42;
+
+      --text-main: #F7FAFC;
+      --text-secondary: #E2E8F0;
+      --text-muted: #A0AEC0;
+      --text-disabled: #718096;
+
+      --border-color: #4A5568;
+      --border-light: #374151;
+      --border-active: #688B5E;
+      --border-divider: #374151;
+
+      --chart-grid: #4A5568;
+      --chart-axis: #A0AEC0;
+      --chart-tooltip-bg: #2D3748;
+      --chart-tooltip-border: #4A5568;
+      --chart-tooltip-text: #F7FAFC;
     }
 
     * {
@@ -61,26 +144,44 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+      transition: var(--transition-smooth);
     }
 
     h1, h2, h3, h4 {
       font-family: 'Outfit', sans-serif;
     }
 
+    /* Professional Universal SVG Icon Helper */
+    .icon-svg {
+      width: 1.15em;
+      height: 1.15em;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: -0.15em;
+      display: inline-block;
+      transition: var(--transition-smooth);
+    }
+
+    .kpi-icon-box .icon-svg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+
     /* ==========================================================================
-       2. HEADER & INTERACTIVE GRID STATUS TOGGLE
+       2. HEADER, LOGO TRANSPARENCY & VIEW SWITCHER NAVIGATION
        ========================================================================== */
     header {
-      background: rgba(17, 24, 39, 0.85);
-      backdrop-filter: blur(12px);
+      background: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
+      padding: 0.75rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
     .header-container {
@@ -89,42 +190,72 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.25rem;
       flex-wrap: wrap;
     }
 
     .logo-group {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 1.25rem;
     }
 
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
-      border-radius: var(--radius-sm);
+    /* Minimalist Logo Image & Theme Contrast Filter */
+    .header-logo-img {
+      height: 44px;
+      max-height: 50px;
+      width: auto;
+      object-fit: contain;
+      vertical-align: middle;
+      transition: var(--transition-smooth);
+    }
+
+    [data-theme="dark"] .header-logo-img {
+      filter: invert(1) brightness(1.25);
+    }
+
+    /* Navigation View Tabs Switcher */
+    .view-switch-nav {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 0 15px var(--accent-cyan-glow);
+      background: var(--bg-card-elevated);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      gap: 0.25rem;
     }
 
-    .logo-text {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(to right, #ffffff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .view-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: var(--transition-smooth);
+    }
+
+    .view-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .view-tab-btn.active {
+      background: var(--bg-card);
+      color: var(--primary-green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
 
     /* Interactive Grid Status Toggle Pill */
     .grid-toggle-pill {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      border: 1px solid rgba(56, 161, 105, 0.3);
       padding: 0.3rem 0.75rem;
       border-radius: 20px;
       font-size: 0.75rem;
@@ -138,13 +269,13 @@
     }
 
     .grid-toggle-pill:hover {
-      transform: scale(1.04);
+      transform: scale(1.02);
     }
 
     .grid-toggle-pill.disconnected {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border-color: rgba(239, 68, 68, 0.4);
+      border-color: rgba(229, 62, 62, 0.35);
     }
 
     .pulse-dot {
@@ -152,23 +283,44 @@
       height: 8px;
       background-color: var(--status-green);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--status-green);
       animation: pulse 2s infinite;
     }
 
     .grid-toggle-pill.disconnected .pulse-dot {
       background-color: var(--status-red);
-      box-shadow: 0 0 8px var(--status-red);
       animation: none;
     }
 
     @keyframes pulse {
       0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.3); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
-    /* Header Global Stats Navigation */
+    /* Light/Dark Mode Switcher Toggle Button */
+    .theme-toggle-btn {
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--border-active);
+      background: var(--bg-card-hover);
+    }
+
+    /* Top Right Header Global Stats Navigation */
     nav.nav-stats {
       display: flex;
       align-items: center;
@@ -197,7 +349,32 @@
     }
 
     /* ==========================================================================
-       3. MAIN LAYOUT & KPI GRID
+       3. STREAMLIT UNIFIED IFRAME CONTAINER (FULL WIDTH / HEIGHT & NO BORDERS)
+       ========================================================================== */
+    .iframe-view-container {
+      width: 100%;
+      height: calc(100vh - 66px);
+      border: none;
+      background: var(--bg-main);
+      overflow: hidden;
+      display: none;
+    }
+
+    .iframe-view-container.active {
+      display: block;
+    }
+
+    .streamlit-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: none;
+      overflow: hidden;
+      display: block;
+    }
+
+    /* ==========================================================================
+       4. MAIN DASHBOARD & MINIMALIST CARD STYLING
        ========================================================================== */
     main {
       max-width: 1600px;
@@ -210,6 +387,10 @@
       gap: 1.5rem;
     }
 
+    main.hidden {
+      display: none;
+    }
+
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -219,16 +400,18 @@
     .kpi-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       padding: 1.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       transition: var(--transition-smooth);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
     .kpi-card:hover {
-      border-color: rgba(255, 255, 255, 0.18);
+      background: var(--bg-card-hover);
+      border-color: var(--border-active);
       transform: translateY(-2px);
     }
 
@@ -239,10 +422,11 @@
     }
 
     .kpi-title {
-      font-size: 0.8rem;
+      font-size: 0.775rem;
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .kpi-num {
@@ -264,7 +448,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
     }
 
     /* Two-Column Responsive Layout */
@@ -286,7 +469,7 @@
       gap: 1.5rem;
     }
 
-    /* Generic Card Shell */
+    /* Generic Minimalist Card Shell */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -295,6 +478,8 @@
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
+      transition: var(--transition-smooth);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
 
     .card-header {
@@ -302,7 +487,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.85rem;
+      padding-bottom: 1rem;
     }
 
     .card-title-group {
@@ -312,8 +497,10 @@
     }
 
     .card-title-icon {
-      color: var(--accent-cyan);
-      font-size: 1.2rem;
+      font-size: 1.25rem;
+      color: var(--primary-green);
+      display: flex;
+      align-items: center;
     }
 
     .card-title {
@@ -327,37 +514,35 @@
       color: var(--text-muted);
     }
 
-    /* ==========================================================================
-       4. CHART & V2G VISUALIZATION
-       ========================================================================== */
+    /* Dual Axis Chart Container */
     .chart-wrapper {
       position: relative;
-      width: 100%;
       height: 340px;
+      width: 100%;
     }
 
     .chart-legend-badge {
       display: flex;
+      align-items: center;
       gap: 1rem;
       font-size: 0.75rem;
+      color: var(--text-muted);
       font-weight: 600;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
     }
 
     .legend-box {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
     }
 
-    /* ==========================================================================
-       5. TELEMATICS DATA TABLE
-       ========================================================================== */
+    /* Telematics Table Styling */
     .table-controls {
       display: flex;
       justify-content: space-between;
@@ -369,41 +554,39 @@
     .search-box {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 0.45rem 0.85rem;
       color: var(--text-main);
-      font-family: inherit;
-      font-size: 0.85rem;
-      width: 220px;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.825rem;
+      outline: none;
+      min-width: 220px;
+      transition: var(--transition-smooth);
     }
 
     .search-box:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
+      border-color: var(--border-active);
     }
 
     .filter-tabs {
       display: flex;
-      gap: 0.4rem;
-      background: var(--bg-input);
-      padding: 0.25rem;
-      border-radius: var(--radius-sm);
+      gap: 0.35rem;
     }
 
     .tab-btn {
-      background: transparent;
-      border: none;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
       color: var(--text-muted);
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
-      font-weight: 600;
+      padding: 0.4rem 0.75rem;
       border-radius: 6px;
+      font-size: 0.775rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: var(--transition-smooth);
     }
 
     .tab-btn.active {
-      background: var(--accent-cyan);
-      color: #000;
+      background: var(--primary-green);
+      color: #FFFFFF;
     }
 
     .table-container {
@@ -421,7 +604,7 @@
     }
 
     table.telematics-table th {
-      background: rgba(31, 41, 61, 0.6);
+      background: var(--bg-table-header);
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
@@ -451,7 +634,7 @@
     .progress-track {
       flex-grow: 1;
       height: 7px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--border-light);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -480,38 +663,28 @@
     .status-badge.healthy {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(56, 161, 105, 0.3);
     }
 
     .status-badge.warning {
       background: var(--status-yellow-bg);
       color: var(--status-yellow);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border: 1px solid rgba(214, 158, 46, 0.3);
     }
 
     .status-badge.critical {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(229, 62, 62, 0.3);
     }
 
     /* ==========================================================================
-       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS (DYNAMIC STATE BINDING)
+       5. AI OPTIMIZATION CONTROL ENGINE & SLIDERS
        ========================================================================== */
     .slider-group {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-      background: rgba(255, 255, 255, 0.02);
-      padding: 1.25rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      transition: var(--transition-smooth);
-    }
-
-    .slider-group.disabled {
-      opacity: 0.55;
-      pointer-events: none;
     }
 
     .slider-item {
@@ -524,29 +697,28 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
     }
 
     .slider-label {
-      font-size: 0.85rem;
+      font-size: 0.825rem;
       font-weight: 600;
       color: var(--text-main);
     }
 
     .slider-value-display {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.12);
-      padding: 0.15rem 0.5rem;
-      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--primary-green);
     }
 
     input[type="range"] {
       -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 6px;
-      border-radius: 3px;
-      background: var(--bg-input);
+      background: var(--border-color);
+      border-radius: 4px;
       outline: none;
       cursor: pointer;
     }
@@ -561,8 +733,8 @@
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 10px var(--accent-cyan);
+      background: var(--primary-green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
       cursor: pointer;
     }
 
@@ -575,10 +747,10 @@
 
     .btn-preset {
       flex: 1;
-      background: var(--bg-input);
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 0.4rem 0.5rem;
+      color: var(--text-secondary);
+      padding: 0.45rem 0.5rem;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
@@ -587,14 +759,15 @@
     }
 
     .btn-preset:hover {
-      border-color: var(--accent-cyan);
+      border-color: var(--border-active);
       color: var(--text-main);
+      background: var(--bg-card-hover);
     }
 
     /* AI Action Center Card */
     .ai-action-center {
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-      border: 1px solid var(--accent-cyan-glow);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 1.25rem;
       display: flex;
@@ -606,8 +779,7 @@
 
     .ai-action-center.applied {
       border-color: var(--status-green);
-      background: linear-gradient(145deg, rgba(6, 78, 59, 0.45), rgba(15, 23, 42, 0.95));
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+      background: var(--status-green-bg);
     }
 
     .ai-header-bar {
@@ -620,9 +792,9 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(6, 182, 212, 0.35);
+      background: var(--primary-green-light);
+      color: var(--primary-green);
+      border: 1px solid rgba(75, 96, 67, 0.3);
       padding: 0.25rem 0.65rem;
       border-radius: 20px;
       font-size: 0.725rem;
@@ -630,18 +802,11 @@
       text-transform: uppercase;
     }
 
-    .ai-action-center.applied .ai-badge {
-      background: var(--status-green-bg);
-      color: var(--status-green);
-      border-color: rgba(16, 185, 129, 0.5);
-    }
-
-    /* Dynamic Projected Metrics Row in AI Action Center */
     .ai-metrics-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--bg-card-elevated);
       padding: 0.75rem;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-color);
@@ -662,30 +827,23 @@
     .ai-metric-val {
       font-size: 1.15rem;
       font-weight: 800;
-      color: var(--accent-cyan);
-    }
-
-    .ai-action-center.applied .ai-metric-val {
-      color: var(--status-green);
+      color: var(--primary-green);
     }
 
     .ai-recommendation-text {
       font-size: 0.875rem;
-      color: #e2e8f0;
+      color: var(--text-secondary);
       line-height: 1.6;
-      background: rgba(0, 0, 0, 0.25);
+      background: var(--bg-card-elevated);
       padding: 0.85rem;
       border-radius: var(--radius-sm);
-      border-left: 3px solid var(--accent-cyan);
+      border-left: 3px solid var(--primary-green);
     }
 
-    .ai-action-center.applied .ai-recommendation-text {
-      border-left-color: var(--status-green);
-    }
-
+    /* Buttons */
     .btn-accept {
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
-      color: #ffffff;
+      background: var(--primary-green);
+      color: #FFFFFF;
       border: none;
       border-radius: var(--radius-sm);
       padding: 0.85rem 1.2rem;
@@ -698,33 +856,26 @@
       justify-content: center;
       gap: 0.5rem;
       transition: var(--transition-smooth);
-      box-shadow: 0 4px 15px var(--accent-cyan-glow);
     }
 
     .btn-accept:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+      background: var(--primary-green-dark);
     }
 
-    .ai-action-center.applied .btn-accept {
-      background: var(--status-green);
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-    }
-
-    /* Floating Toast Success Notification */
+    /* Floating Toast Notification */
     .toast-notification {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--status-green);
       border-radius: var(--radius-md);
       padding: 0.9rem 1.5rem;
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       font-size: 0.95rem;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       gap: 0.6rem;
@@ -745,10 +896,11 @@
       border-top: 1px solid var(--border-color);
       padding: 1rem 2rem;
       margin-top: auto;
-      background: rgba(17, 24, 39, 0.6);
+      background: var(--bg-header);
       text-align: center;
       font-size: 0.8rem;
-      color: var(--text-dim);
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
     }
   </style>
 </head>
@@ -757,20 +909,29 @@
 
   <!-- Floating Toast Notification Banner -->
   <div id="toastNotification" class="toast-notification">
-    <span>✅</span>
+    <svg class="icon-svg" style="color: var(--status-green);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     <span id="toastMessage">Local design preview updated</span>
   </div>
 
   <!-- ==========================================================================
-       HEADER: Global Stats Top Right + Interactive Grid Status Toggle Top Left
+       HEADER: Transparent Logo Integration + View Switcher + Theme Toggle
        ========================================================================== -->
   <header>
     <div class="header-container">
       <div class="logo-group">
-        <div class="logo-icon">⚡</div>
-        <div>
-          <div class="logo-text">VoltAI Design Prototype</div>
-          <div style="font-size: 0.7rem; color: var(--text-muted);">Static visual demo — no fleet or charger connection</div>
+        <!-- Transparent Logo Integration with Fallback & Dark Mode Filters -->
+        <img src="logo_transparent.png" alt="Fleet Management Logo" class="header-logo-img" onError="this.src='Gemini_Generated_Image_n26va3n26va3n26v.png';">
+
+        <!-- Unified View Navigation Switcher Tabs -->
+        <div class="view-switch-nav">
+          <button id="tabDashboard" class="view-tab-btn active" onclick="switchView('dashboard')">
+            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </button>
+          <button id="tabStreamlit" class="view-tab-btn" onclick="switchView('streamlit')">
+            <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Streamlit Engine</span>
+          </button>
         </div>
 
         <!-- Interactive Grid Status Toggle Pill -->
@@ -778,9 +939,17 @@
           <span class="pulse-dot"></span>
           <span id="gridStatusText">SIMULATED GRID ONLINE</span>
         </div>
+
+        <!-- Light/Dark Mode Toggle Button with Professional SVG Icon -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <span id="themeToggleIcon">
+            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </span>
+          <span id="themeToggleText">Light</span>
+        </button>
       </div>
 
-      <!-- Maintained Top Right Header Global Stats -->
+      <!-- Header Global Stats Navigation -->
       <nav class="nav-stats">
         <div class="nav-stat-item">
           <span class="nav-stat-label">Active Fleet</span>
@@ -792,18 +961,25 @@
         </div>
         <div class="nav-stat-item">
           <span class="nav-stat-label">Est. Today Savings</span>
-          <span class="nav-stat-value" style="color: var(--accent-cyan);">$1,420.50</span>
+          <span class="nav-stat-value" style="color: var(--primary-green);">$1,420.50</span>
         </div>
       </nav>
     </div>
   </header>
 
   <!-- ==========================================================================
-       MAIN DASHBOARD: KPI Grid + 2-Column Responsive Layout
+       UNIFIED STREAMLIT IFRAME VIEW (FULL WIDTH / HEIGHT WITH HIDDEN BORDERS)
        ========================================================================== -->
-  <main>
+  <section id="streamlitIframeView" class="iframe-view-container">
+    <iframe src="http://localhost:8501" class="streamlit-iframe" title="Streamlit AI Controller Engine"></iframe>
+  </section>
 
-    <!-- Top KPI Cards -->
+  <!-- ==========================================================================
+       MAIN HTML DASHBOARD: KPI Grid + 2-Column Responsive Layout
+       ========================================================================== -->
+  <main id="mainDashboardView">
+
+    <!-- Top KPI Metric Cards with Minimalist SVG Icons -->
     <section class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-info">
@@ -811,16 +987,20 @@
           <span class="kpi-num" style="color: var(--status-yellow);">$0.48 / kWh</span>
           <span class="kpi-sub" style="color: var(--status-yellow);">Peak Rate Window (4-7 PM)</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">📈</div>
+        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-info">
           <span class="kpi-title">Scheduled Net Load</span>
-          <span class="kpi-num" id="kpiNetLoad">180 kW</span>
-          <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-indigo);">Includes -80 kW V2G Feed-In</span>
+          <span class="kpi-num" id="kpiNetLoad" style="color: var(--primary-green);">180 kW</span>
+          <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-v2g);">Includes -80 kW V2G Feed-In</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan);">⚡</div>
+        <div class="kpi-icon-box" style="background: var(--primary-green-light); color: var(--primary-green);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
@@ -829,30 +1009,36 @@
           <span class="kpi-num" style="color: var(--status-green);">94.2%</span>
           <span class="kpi-sub" style="color: var(--status-green);">+3.1% cycle life extension</span>
         </div>
-        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">🔋</div>
+        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="11" x2="23" y2="13"/><polyline points="11 7 8 12 12 12 9 17"/></svg>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-info">
           <span class="kpi-title">V2G Feed-In Revenue</span>
-          <span class="kpi-num" style="color: var(--accent-indigo);">$340.00</span>
+          <span class="kpi-num" style="color: var(--accent-v2g);">$340.00</span>
           <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo);">🔄</div>
+        <div class="kpi-icon-box" style="background: rgba(113, 128, 150, 0.12); color: var(--text-secondary);">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        </div>
       </div>
     </section>
 
     <!-- 2-Column Main Layout -->
     <div class="dashboard-body">
 
-      <!-- LEFT COLUMN: Dual Axis Chart with V2G Negative Bars & Telematics Table -->
+      <!-- LEFT COLUMN: Dual Axis Chart & Telematics Table -->
       <div class="left-column">
 
         <!-- Module 1: Central Dual-Axis Chart -->
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">📊</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">Scheduled Fleet Load vs. Grid Price Forecast</h2>
                 <div class="card-subtitle">Visualizing V2G discharge (negative kW) during peak price window</div>
@@ -860,9 +1046,9 @@
             </div>
             <!-- Legend Badges -->
             <div class="chart-legend-badge">
-              <div class="legend-item"><span class="legend-box" style="background: #06b6d4;"></span> Charge (+kW)</div>
-              <div class="legend-item"><span class="legend-box" style="background: #818cf8;"></span> V2G Discharging (-kW)</div>
-              <div class="legend-item"><span class="legend-box" style="background: #f59e0b;"></span> Grid Rate ($/kWh)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--primary-green);"></span> Charge (+kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--accent-purple);"></span> V2G Discharging (-kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--status-yellow);"></span> Grid Rate ($/kWh)</div>
             </div>
           </div>
 
@@ -875,7 +1061,9 @@
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">🚘</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">EV Fleet Telematics & Battery Health</h2>
                 <div class="card-subtitle">Real-time State of Charge (SOC%), State of Health (SOH%), and Battery Temperature</div>
@@ -917,11 +1105,13 @@
       <!-- RIGHT COLUMN: AI Optimization Control Engine & Action Center -->
       <div class="right-column">
 
-        <!-- Module 3: AI Control Engine Sliders (Dynamic State Binding) -->
+        <!-- Module 3: AI Control Engine Sliders -->
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon">🤖</span>
+              <span class="card-title-icon">
+                <svg class="icon-svg" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+              </span>
               <div>
                 <h2 class="card-title">AI Optimization Control Engine</h2>
                 <div class="card-subtitle">Relative multi-objective trade-off weights (Sum = 100%)</div>
@@ -954,7 +1144,7 @@
               </div>
             </div>
 
-            <!-- Maintained Strategy Presets Buttons -->
+            <!-- Strategy Presets Buttons -->
             <div>
               <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Strategy Presets:</span>
               <div class="preset-btns">
@@ -965,10 +1155,13 @@
             </div>
           </div>
 
-          <!-- Module 4: AI Action Center with Dynamic State Binding -->
+          <!-- Module 4: AI Action Center -->
           <div id="aiActionCenter" class="ai-action-center">
             <div class="ai-header-bar">
-              <span class="ai-badge" id="aiStatusBadge">✨ Strategy: Cost Minimization - 70%</span>
+              <span class="ai-badge" id="aiStatusBadge">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>Strategy: Cost Minimization - 70%</span>
+              </span>
               <span style="font-size: 0.725rem; color: var(--text-muted);" id="aiTimestamp">Updated just now</span>
             </div>
 
@@ -980,7 +1173,7 @@
               </div>
               <div class="ai-metric-item">
                 <span class="ai-metric-label">V2G Feed-In Revenue</span>
-                <span class="ai-metric-val" id="v2gRevenueVal" style="color: var(--accent-v2g);">$340.00</span>
+                <span class="ai-metric-val" id="v2gRevenueVal" style="color: var(--accent-purple);">$340.00</span>
               </div>
             </div>
 
@@ -990,7 +1183,7 @@
 
             <button id="btnAcceptOptimization" class="btn-accept" onclick="acceptOptimization()">
               <span>Preview Local Design State</span>
-              <span>→</span>
+              <svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           </div>
         </section>
@@ -1003,18 +1196,15 @@
   <footer>
     <div style="max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>VoltAI visual design prototype &copy; 2026</div>
-      <div style="color: var(--accent-cyan); font-weight: 600;">No operational integration</div>
+      <div style="color: var(--primary-green); font-weight: 600;">No operational integration</div>
     </div>
   </footer>
 
   <!-- ==========================================================================
-       JAVASCRIPT ENGINE & LOGIC
-       ========================================================================== */
-  -->
+       JAVASCRIPT ENGINE & LOGIC (WITH VIEW SWITCHER & SVG THEME HANDLING)
+       ========================================================================== -->
   <script>
-    /* ==========================================================================
-       A. TELEMATICS DATA ARRAY
-       ========================================================================== */
+    /* Telematics Data Array */
     const telematicsData = [
       { id: 'EV-101', group: 'Delivery Logistics', soc: 35, soh: 94, temp: 28, status: 'HEALTHY' },
       { id: 'EV-102', group: 'Executive Transit', soc: 82, soh: 98, temp: 25, status: 'HEALTHY' },
@@ -1026,10 +1216,8 @@
       { id: 'EV-108', group: 'Urban Express',     soc: 76, soh: 93, temp: 32, status: 'HEALTHY' }
     ];
 
-    /* ==========================================================================
-       B. GLOBAL STATE & DOM REFERENCES
-       ========================================================================== */
-    let isGridConnected = true; // Grid Synchronized vs Disconnected state
+    /* Global State & DOM References */
+    let isGridConnected = true;
     let isApplied = false;
     let currentFilter = 'ALL';
 
@@ -1050,12 +1238,91 @@
     const toastNotification = document.getElementById('toastNotification');
     const toastMessage = document.getElementById('toastMessage');
 
-    /* ==========================================================================
-       C. SLIDER LOGIC & STATE BINDING (SUM TO 100%)
-       ========================================================================== */
+    const mainDashboardView = document.getElementById('mainDashboardView');
+    const streamlitIframeView = document.getElementById('streamlitIframeView');
+    const tabDashboard = document.getElementById('tabDashboard');
+    const tabStreamlit = document.getElementById('tabStreamlit');
+
+    /* View Switcher Handler */
+    function switchView(viewName) {
+      if (viewName === 'streamlit') {
+        mainDashboardView.classList.add('hidden');
+        streamlitIframeView.classList.add('active');
+        tabDashboard.classList.remove('active');
+        tabStreamlit.classList.add('active');
+      } else {
+        streamlitIframeView.classList.remove('active');
+        mainDashboardView.classList.remove('hidden');
+        tabStreamlit.classList.remove('active');
+        tabDashboard.classList.add('active');
+      }
+    }
+
+    /* Dual Theme Manager */
+    function initTheme() {
+      const savedTheme = localStorage.getItem('voltai_theme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+
+    function applyTheme(theme) {
+      const iconContainer = document.getElementById('themeToggleIcon');
+      const textContainer = document.getElementById('themeToggleText');
+      const streamlitFrame = document.querySelector('.streamlit-iframe');
+
+      const sunSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+      const moonSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        iconContainer.innerHTML = moonSvg;
+        textContainer.textContent = 'Dark';
+        if (streamlitFrame) {
+          streamlitFrame.src = "http://localhost:8501/?embed=true&theme.base=dark&theme.primaryColor=%23688B5E&theme.backgroundColor=%231A202C&theme.secondaryBackgroundColor=%232D3748&theme.textColor=%23F7FAFC";
+        }
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        iconContainer.innerHTML = sunSvg;
+        textContainer.textContent = 'Light';
+        if (streamlitFrame) {
+          streamlitFrame.src = "http://localhost:8501/?embed=true&theme.base=light&theme.primaryColor=%234B6043&theme.backgroundColor=%23F8F9FA&theme.secondaryBackgroundColor=%23FFFFFF&theme.textColor=%232D3748";
+        }
+      }
+      localStorage.setItem('voltai_theme', theme);
+      updateChartTheme();
+    }
+
+    function updateChartTheme() {
+      if (typeof chargingPricingChart === 'undefined' || !chargingPricingChart) return;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      const gridColor = isDark ? '#4A5568' : '#E2E8F0';
+      const labelColor = isDark ? '#A0AEC0' : '#718096';
+      const tooltipBg = isDark ? '#2D3748' : '#FFFFFF';
+      const tooltipBorder = isDark ? '#4A5568' : '#E2E8F0';
+      const tooltipText = isDark ? '#F7FAFC' : '#2D3748';
+
+      chargingPricingChart.options.scales.x.grid.color = gridColor;
+      chargingPricingChart.options.scales.x.ticks.color = labelColor;
+      chargingPricingChart.options.scales.yPrice.grid.color = gridColor;
+      chargingPricingChart.options.scales.yPrice.ticks.color = isDark ? '#ECC94B' : '#D69E2E';
+      chargingPricingChart.options.scales.yLoad.ticks.color = isDark ? '#688B5E' : '#4B6043';
+      chargingPricingChart.options.plugins.tooltip.backgroundColor = tooltipBg;
+      chargingPricingChart.options.plugins.tooltip.borderColor = tooltipBorder;
+      chargingPricingChart.options.plugins.tooltip.titleColor = tooltipText;
+      chargingPricingChart.options.plugins.tooltip.bodyColor = labelColor;
+
+      chargingPricingChart.update();
+    }
+
+    /* Slider Logic & State Binding */
     function handleSliderChange(source) {
       if (isApplied) {
-        // Unlock sliders if user interacts again
         unlockSliders();
       }
 
@@ -1083,13 +1350,11 @@
       longevitySlider.disabled = false;
       sliderContainer.classList.remove('disabled');
       aiActionCenter.classList.remove('applied');
-      btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
+      btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
       isApplied = false;
     }
 
-    /* ==========================================================================
-       D. CHART.JS DUAL-AXIS CHART WITH V2G (-kW) & CURRENT TIME DASHED LINE
-       ========================================================================== */
+    /* Chart.js Dual Axis Chart */
     const hoursLabels = ['12 PM', '1 PM', '2 PM (NOW)', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
     const electricityPrices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12];
 
@@ -1123,48 +1388,51 @@
           ctx.beginPath();
           ctx.setLineDash([5, 5]);
           ctx.lineWidth = 2;
-          ctx.strokeStyle = '#ef4444';
+          ctx.strokeStyle = '#E53E3E';
           ctx.moveTo(x, topY);
           ctx.lineTo(x, bottomY);
           ctx.stroke();
 
-          ctx.fillStyle = '#ef4444';
-          ctx.font = 'bold 10px Inter';
-          ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
+          ctx.fillStyle = '#E53E3E';
+          ctx.font = 'bold 10px Inter, sans-serif';
+          ctx.fillText('CURRENT TIME', x - 35, topY - 6);
           ctx.restore();
         }
       }
     };
 
-    const ctx = document.getElementById('chargingPricingChart').getContext('2d');
-    const chargingPricingChart = new Chart(ctx, {
+    const ctxChart = document.getElementById('chargingPricingChart').getContext('2d');
+    let chargingPricingChart = new Chart(ctxChart, {
       type: 'bar',
       data: {
         labels: hoursLabels,
         datasets: [
           {
             type: 'line',
-            label: 'Grid Price ($/kWh)',
+            label: 'Grid Electricity Price ($/kWh)',
             data: electricityPrices,
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            borderColor: '#D69E2E',
+            backgroundColor: 'rgba(214, 158, 46, 0.1)',
             borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            yAxisID: 'yPrice',
-            pointRadius: 4
+            tension: 0.35,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#D69E2E',
+            yAxisID: 'yPrice'
           },
           {
             type: 'bar',
-            label: 'Scheduled Fleet Load (kW)',
+            label: 'Scheduled Fleet Net Load (kW)',
             data: getCalculatedLoad(),
             backgroundColor: function(context) {
               const val = context.raw;
-              return val < 0 ? 'rgba(129, 140, 248, 0.85)' : 'rgba(6, 182, 212, 0.7)';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              return val < 0 ? 'rgba(113, 128, 150, 0.85)' : (isDark ? 'rgba(104, 139, 94, 0.9)' : 'rgba(75, 96, 67, 0.9)');
             },
             borderColor: function(context) {
               const val = context.raw;
-              return val < 0 ? '#818cf8' : '#06b6d4';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              return val < 0 ? '#718096' : (isDark ? '#688B5E' : '#4B6043');
             },
             borderWidth: 1,
             borderRadius: 4,
@@ -1180,41 +1448,43 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1e293b',
-            titleColor: '#f8fafc',
-            bodyColor: '#cbd5e1',
+            backgroundColor: '#FFFFFF',
+            titleColor: '#2D3748',
+            bodyColor: '#4A5568',
+            borderColor: '#E2E8F0',
+            borderWidth: 1,
             callbacks: {
               label: function(context) {
                 if (context.dataset.label.includes('Load')) {
                   const val = context.raw;
-                  return val < 0 ? ` 🔄 V2G Feed-In Discharge: ${val} kW (Selling to Grid)` : ` ⚡ Fleet Charging Draw: ${val} kW`;
+                  return val < 0 ? ` V2G Discharge: ${val} kW` : ` Fleet Charging Draw: ${val} kW`;
                 }
-                return ` 📈 Grid Price: $${context.raw.toFixed(2)}/kWh`;
+                return ` Grid Price: $${context.raw.toFixed(2)}/kWh`;
               }
             }
           }
         },
         scales: {
           x: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+            grid: { color: '#E2E8F0' },
+            ticks: { color: '#718096', font: { family: 'Inter', size: 10 } }
           },
           yPrice: {
             type: 'linear',
             position: 'left',
-            title: { display: true, text: 'Grid Price ($/kWh)', color: '#f59e0b', font: { weight: 'bold' } },
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#f59e0b', callback: (v) => '$' + v.toFixed(2) }
+            title: { display: true, text: 'Grid Price ($/kWh)', color: '#D69E2E', font: { weight: 'bold' } },
+            grid: { color: '#E2E8F0' },
+            ticks: { color: '#D69E2E', callback: (v) => '$' + v.toFixed(2) }
           },
           yLoad: {
             type: 'linear',
             position: 'right',
-            title: { display: true, text: 'Scheduled Load (kW)', color: '#06b6d4', font: { weight: 'bold' } },
+            title: { display: true, text: 'Scheduled Load (kW)', color: '#4B6043', font: { weight: 'bold' } },
             min: -120,
             max: 300,
             grid: { drawOnChartArea: false },
             ticks: {
-              color: '#06b6d4',
+              color: '#4B6043',
               callback: (v) => v < 0 ? v + ' kW (V2G)' : v + ' kW'
             }
           }
@@ -1222,9 +1492,7 @@
       }
     });
 
-    /* ==========================================================================
-       E. INTERACTIVE GRID STATUS TOGGLE PILL
-       ========================================================================== */
+    /* Interactive Grid Status Toggle */
     function toggleGridStatus() {
       isGridConnected = !isGridConnected;
 
@@ -1241,9 +1509,7 @@
       updateUI();
     }
 
-    /* ==========================================================================
-       F. DYNAMIC AI REASONING ENGINE (STATE BINDING & SAVINGS CALCULATION)
-       ========================================================================== */
+    /* Dynamic AI Reasoning Engine UI Update */
     function updateUI() {
       const costWeight = parseInt(costSlider.value);
       const longevityWeight = parseInt(longevitySlider.value);
@@ -1251,27 +1517,25 @@
       costValDisplay.textContent = costWeight + '%';
       longevityValDisplay.textContent = longevityWeight + '%';
 
-      // Dynamic calculation for Projected Nightly Financial Savings
       const calculatedSavings = Math.round(150 + (costWeight * 5.25));
       projectedSavingsVal.textContent = `$${calculatedSavings}.00`;
 
-      // Update Chart Load Data
       chargingPricingChart.data.datasets[1].data = getCalculatedLoad();
       chargingPricingChart.update();
 
-      // State Binding: Dynamically reflect exact strategy integer in AI Badge Title
       const dominantStrategy = costWeight >= 50 ? 'Cost Minimization' : 'Battery Longevity Protection';
       const dominantVal = costWeight >= 50 ? costWeight : longevityWeight;
+
+      const sparklesSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
       
       if (!isApplied) {
-        aiStatusBadge.textContent = `✨ Strategy: ${dominantStrategy} - ${dominantVal}%`;
+        aiStatusBadge.innerHTML = `${sparklesSvg} <span>Strategy: ${dominantStrategy} - ${dominantVal}%</span>`;
       }
 
-      // Dynamic AI Text updating with exact slider integers
       let recText = '';
 
       if (!isGridConnected) {
-        recText = `<strong>⚠️ SIMULATED GRID-OFFLINE STATE:</strong> This visual prototype has switched to its static fallback display. It does not read telemetry or control charging equipment.`;
+        recText = `<strong>SIMULATED GRID-OFFLINE STATE:</strong> This visual prototype has switched to its static fallback display. It does not read telemetry or control charging equipment.`;
       } else if (costWeight >= 50) {
         recText = `This static design preview illustrates a cost-focused dashboard state at <strong>${costWeight}%</strong>. Its prices, V2G figures, and savings are demonstration values only; use the Streamlit app for checked fixture-based schedules.`;
       } else {
@@ -1281,28 +1545,24 @@
       aiRecommendationText.innerHTML = recText;
     }
 
-    /* ==========================================================================
-       G. INTERACTIVE ACCEPT STATE & TOAST NOTIFICATION
-       ========================================================================== */
+    /* Interactive Accept State */
     function acceptOptimization() {
       if (!isGridConnected) {
-        showToast("⚠️ The simulated grid is offline; preview state is unavailable", "warning");
+        showToast("The simulated grid is offline; preview state is unavailable", "warning");
         return;
       }
 
-      // Visually lock sliders to simulate schedule deployment
       costSlider.disabled = true;
       longevitySlider.disabled = true;
       sliderContainer.classList.add('disabled');
 
-      // Update AI Card visuals to Green Applied State
       aiActionCenter.classList.add('applied');
-      aiStatusBadge.textContent = '✓ Local Preview State Active';
-      btnAcceptOptimization.innerHTML = `<span>Local Preview Active</span> <span>✓</span>`;
+      const checkSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+      aiStatusBadge.innerHTML = `${checkSvg} <span>Local Preview State Active</span>`;
+      btnAcceptOptimization.innerHTML = `<span>Local Preview Active</span> ${checkSvg}`;
       isApplied = true;
 
-      // Trigger floating success toast notification
-      showToast("Local design preview updated — no schedule was sent", "success");
+      showToast("Local design preview updated - no schedule was sent", "success");
     }
 
     function showToast(message, type = "success") {
@@ -1314,9 +1574,7 @@
       }, 3500);
     }
 
-    /* ==========================================================================
-       H. TELEMATICS TABLE RENDERER
-       ========================================================================== */
+    /* Telematics Table Renderer */
     function renderTelematicsTable(data) {
       telematicsTableBody.innerHTML = '';
 
@@ -1331,19 +1589,19 @@
         let progressColor = 'var(--status-green)';
 
         if (vehicle.status === 'HEALTHY') {
-          statusBadgeHtml = `<span class="status-badge healthy">● Healthy</span>`;
+          statusBadgeHtml = `<span class="status-badge healthy">Healthy</span>`;
           progressColor = 'var(--status-green)';
         } else if (vehicle.status === 'WARNING') {
-          statusBadgeHtml = `<span class="status-badge warning">▲ Throttled</span>`;
+          statusBadgeHtml = `<span class="status-badge warning">Throttled</span>`;
           progressColor = 'var(--status-yellow)';
         } else {
-          statusBadgeHtml = `<span class="status-badge critical">✖ Critical / Hot</span>`;
+          statusBadgeHtml = `<span class="status-badge critical">Critical / Hot</span>`;
           progressColor = 'var(--status-red)';
         }
 
         tr.innerHTML = `
           <td style="font-weight: 700; color: var(--text-main);">${vehicle.id}</td>
-          <td style="color: var(--text-muted);">${vehicle.group}</td>
+          <td style="color: var(--text-secondary);">${vehicle.group}</td>
           <td>
             <div class="progress-bar-wrap">
               <div class="progress-track">
@@ -1388,8 +1646,9 @@
 
     tableSearchInput.addEventListener('input', applyTableFilters);
 
-    // Initial Load
+    /* Initial Load */
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       renderTelematicsTable(telematicsData);
       updateUI();
     });
