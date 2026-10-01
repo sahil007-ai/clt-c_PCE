@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleet Management - EV Fleet Optimization System</title>
+  <title>VoltAI - Visual Design Prototype</title>
 
   <!-- Google Fonts: Outfit for modern headers, Inter for crisp legibility -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -910,7 +910,7 @@
   <!-- Floating Toast Notification Banner -->
   <div id="toastNotification" class="toast-notification">
     <svg class="icon-svg" style="color: var(--status-green);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    <span id="toastMessage">Schedule Synchronized with Fleet</span>
+    <span id="toastMessage">Local design preview updated</span>
   </div>
 
   <!-- ==========================================================================
@@ -937,7 +937,7 @@
         <!-- Interactive Grid Status Toggle Pill -->
         <div id="gridStatusPill" class="grid-toggle-pill" onclick="toggleGridStatus()" title="Click to toggle Grid Connection status">
           <span class="pulse-dot"></span>
-          <span id="gridStatusText">GRID SYNCHRONIZED</span>
+          <span id="gridStatusText">SIMULATED GRID ONLINE</span>
         </div>
 
         <!-- Light/Dark Mode Toggle Button with Professional SVG Icon -->
@@ -1182,7 +1182,7 @@
             </p>
 
             <button id="btnAcceptOptimization" class="btn-accept" onclick="acceptOptimization()">
-              <span>Accept & Apply Optimization</span>
+              <span>Preview Local Design State</span>
               <svg class="icon-svg" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           </div>
@@ -1195,8 +1195,8 @@
 
   <footer>
     <div style="max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>Fleet Management EV Optimization System &copy; 2026</div>
-      <div style="color: var(--primary-green); font-weight: 600;">System Status: Operational</div>
+      <div>VoltAI visual design prototype &copy; 2026</div>
+      <div style="color: var(--primary-green); font-weight: 600;">No operational integration</div>
     </div>
   </footer>
 
@@ -1498,12 +1498,12 @@
 
       if (isGridConnected) {
         gridStatusPill.className = 'grid-toggle-pill';
-        gridStatusText.textContent = 'GRID SYNCHRONIZED';
-        showToast("Grid Telematics Synchronized", "success");
+        gridStatusText.textContent = 'SIMULATED GRID ONLINE';
+        showToast("Simulated grid state: online", "success");
       } else {
         gridStatusPill.className = 'grid-toggle-pill disconnected';
-        gridStatusText.textContent = 'GRID DISCONNECTED';
-        showToast("Grid Connection Disconnected - Safe Fallback Active", "warning");
+        gridStatusText.textContent = 'SIMULATED GRID OFFLINE';
+        showToast("Simulated grid state: offline", "warning");
       }
 
       updateUI();
@@ -1535,11 +1535,11 @@
       let recText = '';
 
       if (!isGridConnected) {
-        recText = `<strong>GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. Fleet Management system has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
+        recText = `<strong>SIMULATED GRID-OFFLINE STATE:</strong> This visual prototype has switched to its static fallback display. It does not read telemetry or control charging equipment.`;
       } else if (costWeight >= 50) {
-        recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With <strong>Strategy: Cost Minimization - ${costWeight}%</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, generating <strong>$340.00</strong> in V2G revenues and yielding <strong>$${calculatedSavings}.00</strong> in projected nightly savings.`;
+        recText = `This static design preview illustrates a cost-focused dashboard state at <strong>${costWeight}%</strong>. Its prices, V2G figures, and savings are demonstration values only; use the Streamlit app for checked fixture-based schedules.`;
       } else {
-        recText = `Battery telematics indicate elevated cell temperatures on 2 service EVs. With <strong>Strategy: Battery Longevity Protection - ${longevityWeight}%</strong>, V2G deep discharge is throttled and charging rates are capped at 40 kW to eliminate thermal degradation while yielding <strong>$${calculatedSavings}.00</strong> in projected savings.`;
+        recText = `This static design preview illustrates a battery-health-focused state at <strong>${longevityWeight}%</strong>. Its telematics and savings are demonstration values only; it does not assess batteries or control chargers.`;
       }
 
       aiRecommendationText.innerHTML = recText;
@@ -1548,7 +1548,7 @@
     /* Interactive Accept State */
     function acceptOptimization() {
       if (!isGridConnected) {
-        showToast("Cannot deploy AI schedule while Grid is Disconnected", "warning");
+        showToast("The simulated grid is offline; preview state is unavailable", "warning");
         return;
       }
 
@@ -1558,11 +1558,11 @@
 
       aiActionCenter.classList.add('applied');
       const checkSvg = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-      aiStatusBadge.innerHTML = `${checkSvg} <span>Schedule Synchronized with Fleet</span>`;
-      btnAcceptOptimization.innerHTML = `<span>Schedule Deployed & Enforced</span> ${checkSvg}`;
+      aiStatusBadge.innerHTML = `${checkSvg} <span>Local Preview State Active</span>`;
+      btnAcceptOptimization.innerHTML = `<span>Local Preview Active</span> ${checkSvg}`;
       isApplied = true;
 
-      showToast("Schedule Synchronized with Fleet", "success");
+      showToast("Local design preview updated - no schedule was sent", "success");
     }
 
     function showToast(message, type = "success") {

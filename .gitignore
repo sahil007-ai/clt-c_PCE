@@ -5,3 +5,4 @@ __pycache__/
 .env
 evaluation/results/*.json
 saved_outputs/approvals.jsonl
+.deps/
