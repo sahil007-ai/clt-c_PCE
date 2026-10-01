@@ -15,58 +15,124 @@
 
   <style>
     /* ==========================================================================
-       1. DESIGN SYSTEM & COLOR TOKENS (Midnight AI + Electric Cyan + Violet)
+       1. DESIGN SYSTEM & DUAL-THEME COLOR TOKENS (DEFAULT: LIGHT, DATA-THEME: DARK)
        ========================================================================== */
     :root {
-      /* Background System */
-      --bg-main: #080D1A;
-      --bg-header: #0D1424;
-      --bg-card: #111827;
-      --bg-card-elevated: #151E30;
-      --bg-card-hover: #1A2538;
-      --bg-input: #151E30;
+      /* LIGHT THEME (DEFAULT) */
+      --bg-main: #F7F9FB;
+      --bg-header: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-card-elevated: #F8FAFC;
+      --bg-card-hover: #F1F5F9;
+      --bg-input: #FFFFFF;
+      --bg-table-header: #F7F9FB;
 
-      /* Brand Colors */
-      --accent-cyan: #22D3EE;
-      --accent-cyan-light: #67E8F9;
-      --accent-cyan-dark: #0891B2;
+      /* Primary Brand & Accent Palette */
+      --primary-green: #168C5B;
+      --primary-green-light: #E7F7EF;
+      --primary-green-dark: #0E7047;
+
+      --secondary-blue: #249BD7;
+      --secondary-blue-light: #E8F6FC;
+
+      --accent-cyan: #28C7C1;
+      --accent-cyan-light: #E7FAF9;
       --accent-purple: #8B5CF6;
-      --accent-purple-deep: #6D28D9;
-      --accent-v2g: #8B5CF6;       /* V2G Discharging = #8B5CF6 */
+      --accent-v2g: #8B5CF6;
 
       /* Status Palette */
-      --status-green: #10B981;
-      --status-green-light: #34D399;
-      --status-green-bg: rgba(16, 185, 129, 0.12);
+      --status-green: #16A765;
+      --status-green-bg: #E8F7EF;
 
-      --status-yellow: #F59E0B;
-      --status-yellow-light: #FBBF24;
-      --status-yellow-bg: rgba(245, 158, 11, 0.12);
+      --status-yellow: #F4A340;
+      --status-yellow-bg: #FFF4E5;
 
-      --status-red: #EF4444;
-      --status-red-light: #F87171;
-      --status-red-bg: rgba(239, 68, 68, 0.12);
+      --status-red: #E74C3C;
+      --status-red-bg: #FDECEA;
 
-      --status-info: #3B82F6;
-      --status-info-light: #60A5FA;
+      --status-info: #249BD7;
+      --status-info-bg: #E8F6FC;
 
       /* Typography Tokens */
-      --text-main: #F8FAFC;
-      --text-secondary: #CBD5E1;
+      --text-main: #1F2937;
+      --text-secondary: #64748B;
       --text-muted: #94A3B8;
-      --text-disabled: #64748B;
+      --text-disabled: #CBD5E1;
 
       /* Borders & Dividers */
-      --border-color: #1E293B;
-      --border-light: #263449;
-      --border-active: #22D3EE;
-      --border-divider: #172033;
+      --border-color: #E5E7EB;
+      --border-light: #EEF1F4;
+      --border-active: #249BD7;
+      --border-divider: #EEF1F4;
 
-      /* Radii & Transitions */
+      /* Chart Tokens */
+      --chart-grid: #EEF1F4;
+      --chart-axis: #64748B;
+      --chart-tooltip-bg: #FFFFFF;
+      --chart-tooltip-border: #E5E7EB;
+      --chart-tooltip-text: #1F2937;
+
+      /* Radii & Smooth Theme Transitions */
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 16px;
-      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    [data-theme="dark"] {
+      /* DARK THEME COLORS */
+      --bg-main: #0B1220;
+      --bg-header: #0F172A;
+      --bg-card: #151F2E;
+      --bg-card-elevated: #1B293A;
+      --bg-card-hover: #1B293A;
+      --bg-input: #151F2E;
+      --bg-table-header: #111827;
+
+      /* Primary Brand & Accent Palette */
+      --primary-green: #29B878;
+      --primary-green-light: #143B2B;
+      --primary-green-dark: #3DD692;
+
+      --secondary-blue: #35A9E0;
+      --secondary-blue-light: #102E3D;
+
+      --accent-cyan: #2DD4BF;
+      --accent-cyan-light: #123936;
+      --accent-purple: #8B5CF6;
+      --accent-v2g: #8B5CF6;
+
+      /* Status Palette */
+      --status-green: #2CCB82;
+      --status-green-bg: #123727;
+
+      --status-yellow: #F6B84B;
+      --status-yellow-bg: #3A2C13;
+
+      --status-red: #F05B50;
+      --status-red-bg: #3A1917;
+
+      --status-info: #35A9E0;
+      --status-info-bg: #102E3D;
+
+      /* Typography Tokens */
+      --text-main: #F8FAFC;
+      --text-secondary: #B7C2D0;
+      --text-muted: #718096;
+      --text-disabled: #4A5568;
+
+      /* Borders & Dividers */
+      --border-color: #263445;
+      --border-light: #1D2938;
+      --border-active: #35A9E0;
+      --border-divider: #1D2938;
+
+      /* Chart Tokens */
+      --chart-grid: #263445;
+      --chart-axis: #B7C2D0;
+      --chart-tooltip-bg: #151F2E;
+      --chart-tooltip-border: #263445;
+      --chart-tooltip-text: #F8FAFC;
     }
 
     * {
@@ -83,9 +149,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.07) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(34, 211, 238, 0.05) 0%, transparent 40%);
+      transition: var(--transition-smooth);
     }
 
     h1, h2, h3, h4 {
@@ -93,16 +157,16 @@
     }
 
     /* ==========================================================================
-       2. HEADER & INTERACTIVE GRID STATUS TOGGLE
+       2. HEADER, TOGGLE & CONTROL BAR
        ========================================================================== */
     header {
       background: var(--bg-header);
-      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-color);
       padding: 1rem 2rem;
       position: sticky;
       top: 0;
       z-index: 100;
+      transition: var(--transition-smooth);
     }
 
     .header-container {
@@ -124,30 +188,28 @@
     .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      background: var(--primary-green);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.3rem;
-      color: #080D1A;
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(22, 140, 91, 0.2);
     }
 
     .logo-text {
       font-size: 1.35rem;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(to right, var(--text-main), var(--text-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
     }
 
     /* Interactive Grid Status Toggle Pill */
     .grid-toggle-pill {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(22, 167, 101, 0.3);
       padding: 0.3rem 0.75rem;
       border-radius: 20px;
       font-size: 0.75rem;
@@ -161,14 +223,13 @@
     }
 
     .grid-toggle-pill:hover {
-      transform: scale(1.03);
-      border-color: rgba(16, 185, 129, 0.5);
+      transform: scale(1.02);
     }
 
     .grid-toggle-pill.disconnected {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border-color: rgba(239, 68, 68, 0.35);
+      border-color: rgba(231, 76, 60, 0.35);
     }
 
     .pulse-dot {
@@ -176,13 +237,11 @@
       height: 8px;
       background-color: var(--status-green);
       border-radius: 50%;
-      box-shadow: 0 0 4px rgba(16, 185, 129, 0.3);
       animation: pulse 2s infinite;
     }
 
     .grid-toggle-pill.disconnected .pulse-dot {
       background-color: var(--status-red);
-      box-shadow: 0 0 4px rgba(239, 68, 68, 0.3);
       animation: none;
     }
 
@@ -190,6 +249,29 @@
       0% { transform: scale(0.95); opacity: 0.8; }
       50% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Light/Dark Theme Switcher Toggle Button */
+    .theme-toggle-btn {
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--border-active);
+      background: var(--bg-card-hover);
     }
 
     /* Header Global Stats Navigation */
@@ -221,7 +303,7 @@
     }
 
     /* ==========================================================================
-       3. MAIN LAYOUT & METRIC CARDS
+       3. MAIN LAYOUT & STAT CARDS
        ========================================================================== */
     main {
       max-width: 1600px;
@@ -249,10 +331,11 @@
       justify-content: space-between;
       align-items: center;
       transition: var(--transition-smooth);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .kpi-card:hover {
-      background: var(--bg-card-elevated);
+      background: var(--bg-card-hover);
       border-color: var(--border-light);
       transform: translateY(-2px);
     }
@@ -321,6 +404,8 @@
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
+      transition: var(--transition-smooth);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .card-header {
@@ -338,7 +423,7 @@
     }
 
     .card-title-icon {
-      color: var(--accent-cyan);
+      color: var(--primary-green);
       font-size: 1.2rem;
     }
 
@@ -416,6 +501,7 @@
       background: var(--bg-input);
       padding: 0.25rem;
       border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
     }
 
     .tab-btn {
@@ -431,8 +517,8 @@
     }
 
     .tab-btn.active {
-      background: var(--accent-cyan);
-      color: #061018;
+      background: var(--primary-green);
+      color: #FFFFFF;
     }
 
     .table-container {
@@ -450,7 +536,7 @@
     }
 
     table.telematics-table th {
-      background: rgba(21, 30, 48, 0.8);
+      background: var(--bg-table-header);
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
@@ -480,7 +566,7 @@
     .progress-track {
       flex-grow: 1;
       height: 7px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--border-light);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -509,29 +595,29 @@
     .status-badge.healthy {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(22, 167, 101, 0.3);
     }
 
     .status-badge.warning {
       background: var(--status-yellow-bg);
       color: var(--status-yellow);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border: 1px solid rgba(244, 163, 64, 0.3);
     }
 
     .status-badge.critical {
       background: var(--status-red-bg);
       color: var(--status-red);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(231, 76, 60, 0.3);
     }
 
     /* ==========================================================================
-       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS (STATE BINDING)
+       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS
        ========================================================================== */
     .slider-group {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-      background: rgba(21, 30, 48, 0.4);
+      background: var(--bg-card-elevated);
       padding: 1.25rem;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
@@ -564,8 +650,8 @@
     .slider-value-display {
       font-size: 0.85rem;
       font-weight: 700;
-      color: var(--accent-cyan);
-      background: rgba(34, 211, 238, 0.12);
+      color: var(--primary-green);
+      background: var(--status-green-bg);
       padding: 0.15rem 0.5rem;
       border-radius: 6px;
     }
@@ -590,17 +676,12 @@
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+      background: var(--primary-green);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
       cursor: pointer;
     }
 
-    #longevitySlider::-webkit-slider-thumb {
-      background: var(--status-green);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-    }
-
-    /* Strategy Presets Buttons (Secondary Button Styling) */
+    /* Strategy Presets Buttons */
     .preset-btns {
       display: flex;
       gap: 0.5rem;
@@ -609,8 +690,8 @@
 
     .btn-preset {
       flex: 1;
-      background: var(--bg-card-elevated);
-      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       color: var(--text-secondary);
       padding: 0.45rem 0.5rem;
       border-radius: 6px;
@@ -621,7 +702,7 @@
     }
 
     .btn-preset:hover {
-      border-color: var(--accent-cyan);
+      border-color: var(--border-active);
       color: var(--text-main);
       background: var(--bg-card-hover);
     }
@@ -641,8 +722,7 @@
 
     .ai-action-center.applied {
       border-color: var(--status-green);
-      background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), var(--bg-card));
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.20);
+      background: var(--status-green-bg);
     }
 
     .ai-header-bar {
@@ -655,9 +735,9 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: rgba(139, 92, 246, 0.15);
-      color: var(--accent-purple);
-      border: 1px solid rgba(139, 92, 246, 0.35);
+      background: var(--status-green-bg);
+      color: var(--primary-green);
+      border: 1px solid rgba(22, 167, 101, 0.3);
       padding: 0.25rem 0.65rem;
       border-radius: 20px;
       font-size: 0.725rem;
@@ -665,13 +745,6 @@
       text-transform: uppercase;
     }
 
-    .ai-action-center.applied .ai-badge {
-      background: var(--status-green-bg);
-      color: var(--status-green);
-      border-color: rgba(16, 185, 129, 0.4);
-    }
-
-    /* Dynamic Projected Metrics Row */
     .ai-metrics-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -697,11 +770,7 @@
     .ai-metric-val {
       font-size: 1.15rem;
       font-weight: 800;
-      color: var(--accent-cyan);
-    }
-
-    .ai-action-center.applied .ai-metric-val {
-      color: var(--status-green);
+      color: var(--primary-green);
     }
 
     .ai-recommendation-text {
@@ -711,17 +780,13 @@
       background: var(--bg-card-elevated);
       padding: 0.85rem;
       border-radius: var(--radius-sm);
-      border-left: 3px solid var(--accent-cyan);
+      border-left: 3px solid var(--primary-green);
     }
 
-    .ai-action-center.applied .ai-recommendation-text {
-      border-left-color: var(--status-green);
-    }
-
-    /* Primary & AI Buttons */
+    /* Buttons */
     .btn-accept {
-      background: var(--accent-cyan);
-      color: #061018;
+      background: var(--primary-green);
+      color: #FFFFFF;
       border: none;
       border-radius: var(--radius-sm);
       padding: 0.85rem 1.2rem;
@@ -734,26 +799,18 @@
       justify-content: center;
       gap: 0.5rem;
       transition: var(--transition-smooth);
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.20);
     }
 
     .btn-accept:hover {
-      background: var(--accent-cyan-light);
-      transform: translateY(-1px);
+      background: var(--primary-green-dark);
     }
 
-    .ai-action-center.applied .btn-accept {
-      background: var(--accent-purple);
-      color: #FFFFFF;
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.20);
-    }
-
-    /* Floating Toast Success Notification */
+    /* Floating Toast Notification */
     .toast-notification {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
-      background: var(--bg-card-elevated);
+      background: var(--bg-card);
       color: var(--text-main);
       border: 1px solid var(--status-green);
       border-radius: var(--radius-md);
@@ -761,7 +818,7 @@
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       font-size: 0.95rem;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.20);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       gap: 0.6rem;
@@ -786,6 +843,7 @@
       text-align: center;
       font-size: 0.8rem;
       color: var(--text-muted);
+      transition: var(--transition-smooth);
     }
   </style>
 </head>
@@ -799,7 +857,7 @@
   </div>
 
   <!-- ==========================================================================
-       HEADER: Global Stats Top Right + Interactive Grid Status Toggle Top Left
+       HEADER & TOP CONTROLS WITH THEME TOGGLE
        ========================================================================== -->
   <header>
     <div class="header-container">
@@ -815,6 +873,12 @@
           <span class="pulse-dot"></span>
           <span id="gridStatusText">GRID SYNCHRONIZED</span>
         </div>
+
+        <!-- Light / Dark Mode Toggle Button -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <span id="themeToggleIcon">☀️</span>
+          <span id="themeToggleText">Light</span>
+        </button>
       </div>
 
       <!-- Maintained Top Right Header Global Stats -->
@@ -829,7 +893,7 @@
         </div>
         <div class="nav-stat-item">
           <span class="nav-stat-label">Est. Today Savings</span>
-          <span class="nav-stat-value" style="color: var(--accent-cyan);">$1,420.50</span>
+          <span class="nav-stat-value" style="color: var(--primary-green);">$1,420.50</span>
         </div>
       </nav>
     </div>
@@ -840,7 +904,7 @@
        ========================================================================== -->
   <main>
 
-    <!-- Top KPI Cards with Semantic Colors -->
+    <!-- Top KPI Metric Cards -->
     <section class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-info">
@@ -857,7 +921,7 @@
           <span class="kpi-num" id="kpiNetLoad" style="color: var(--accent-cyan);">180 kW</span>
           <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-v2g);">Includes -80 kW V2G Feed-In</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(34, 211, 238, 0.12); color: var(--accent-cyan);">⚡</div>
+        <div class="kpi-icon-box" style="background: var(--accent-cyan-light); color: var(--accent-cyan);">⚡</div>
       </div>
 
       <div class="kpi-card">
@@ -875,7 +939,7 @@
           <span class="kpi-num" style="color: var(--accent-v2g);">$340.00</span>
           <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
         </div>
-        <div class="kpi-icon-box" style="background: rgba(139, 92, 246, 0.15); color: var(--accent-purple);">🔄</div>
+        <div class="kpi-icon-box" style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">🔄</div>
       </div>
     </section>
 
@@ -895,11 +959,11 @@
                 <div class="card-subtitle">Visualizing V2G discharge (negative kW) during peak price window</div>
               </div>
             </div>
-            <!-- Legend Badges with Semantic Colors -->
+            <!-- Legend Badges -->
             <div class="chart-legend-badge">
-              <div class="legend-item"><span class="legend-box" style="background: #22D3EE;"></span> Charge (+kW)</div>
-              <div class="legend-item"><span class="legend-box" style="background: #8B5CF6;"></span> V2G Discharging (-kW)</div>
-              <div class="legend-item"><span class="legend-box" style="background: #F59E0B;"></span> Grid Rate ($/kWh)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--accent-cyan);"></span> Charge (+kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--accent-purple);"></span> V2G Discharging (-kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: var(--status-yellow);"></span> Grid Rate ($/kWh)</div>
             </div>
           </div>
 
@@ -912,7 +976,7 @@
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon" style="color: var(--accent-cyan);">🚘</span>
+              <span class="card-title-icon">🚘</span>
               <div>
                 <h2 class="card-title">EV Fleet Telematics & Battery Health</h2>
                 <div class="card-subtitle">Real-time State of Charge (SOC%), State of Health (SOH%), and Battery Temperature</div>
@@ -954,11 +1018,11 @@
       <!-- RIGHT COLUMN: AI Optimization Control Engine & Action Center -->
       <div class="right-column">
 
-        <!-- Module 3: AI Control Engine Sliders (Dynamic State Binding) -->
+        <!-- Module 3: AI Control Engine Sliders -->
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="card-title-icon" style="color: var(--accent-purple);">🤖</span>
+              <span class="card-title-icon">🤖</span>
               <div>
                 <h2 class="card-title">AI Optimization Control Engine</h2>
                 <div class="card-subtitle">Relative multi-objective trade-off weights (Sum = 100%)</div>
@@ -983,7 +1047,7 @@
             <div class="slider-item">
               <div class="slider-header">
                 <span class="slider-label">Battery Longevity Protection</span>
-                <span class="slider-value-display" id="longevityValDisplay" style="color: var(--status-green); background: rgba(16, 185, 129, 0.12);">30%</span>
+                <span class="slider-value-display" id="longevityValDisplay" style="color: var(--primary-green); background: var(--status-green-bg);">30%</span>
               </div>
               <input type="range" id="longevitySlider" min="0" max="100" value="30" step="5" oninput="handleSliderChange('longevity')">
               <div style="font-size: 0.7rem; color: var(--text-muted);">
@@ -1002,7 +1066,7 @@
             </div>
           </div>
 
-          <!-- Module 4: AI Action Center with Dynamic State Binding -->
+          <!-- Module 4: AI Action Center -->
           <div id="aiActionCenter" class="ai-action-center">
             <div class="ai-header-bar">
               <span class="ai-badge" id="aiStatusBadge">✨ Strategy: Cost Minimization - 70%</span>
@@ -1040,12 +1104,12 @@
   <footer>
     <div style="max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>VoltAI Energy & EV Fleet Optimization System &copy; 2026</div>
-      <div style="color: var(--accent-cyan); font-weight: 600;">System Status: Operational</div>
+      <div style="color: var(--primary-green); font-weight: 600;">System Status: Operational</div>
     </div>
   </footer>
 
   <!-- ==========================================================================
-       JAVASCRIPT ENGINE & LOGIC
+       JAVASCRIPT ENGINE & LOGIC (WITH THEME SYSTEM MANAGER)
        ========================================================================== */
   -->
   <script>
@@ -1066,7 +1130,7 @@
     /* ==========================================================================
        B. GLOBAL STATE & DOM REFERENCES
        ========================================================================== */
-    let isGridConnected = true; // Grid Synchronized vs Disconnected state
+    let isGridConnected = true;
     let isApplied = false;
     let currentFilter = 'ALL';
 
@@ -1088,7 +1152,58 @@
     const toastMessage = document.getElementById('toastMessage');
 
     /* ==========================================================================
-       C. SLIDER LOGIC & STATE BINDING (SUM TO 100%)
+       C. DUAL THEME MANAGER (LIGHT DEFAULT / DARK PERSISTENT)
+       ========================================================================== */
+    function initTheme() {
+      const savedTheme = localStorage.getItem('voltai_theme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggleIcon').textContent = '🌙';
+        document.getElementById('themeToggleText').textContent = 'Dark';
+      } else {
+        document.documentElement.removeAttribute('data-theme'); // default Light mode
+        document.getElementById('themeToggleIcon').textContent = '☀️';
+        document.getElementById('themeToggleText').textContent = 'Light';
+      }
+      localStorage.setItem('voltai_theme', theme);
+      updateChartTheme();
+    }
+
+    function updateChartTheme() {
+      if (typeof chargingPricingChart === 'undefined' || !chargingPricingChart) return;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      const gridColor = isDark ? '#263445' : '#EEF1F4';
+      const labelColor = isDark ? '#B7C2D0' : '#64748B';
+      const tooltipBg = isDark ? '#151F2E' : '#FFFFFF';
+      const tooltipBorder = isDark ? '#263445' : '#E5E7EB';
+      const tooltipText = isDark ? '#F8FAFC' : '#1F2937';
+
+      chargingPricingChart.options.scales.x.grid.color = gridColor;
+      chargingPricingChart.options.scales.x.ticks.color = labelColor;
+      chargingPricingChart.options.scales.yPrice.grid.color = gridColor;
+      chargingPricingChart.options.scales.yPrice.ticks.color = isDark ? '#F6B84B' : '#F4A340';
+      chargingPricingChart.options.scales.yLoad.ticks.color = isDark ? '#2DD4BF' : '#28C7C1';
+      chargingPricingChart.options.plugins.tooltip.backgroundColor = tooltipBg;
+      chargingPricingChart.options.plugins.tooltip.borderColor = tooltipBorder;
+      chargingPricingChart.options.plugins.tooltip.titleColor = tooltipText;
+      chargingPricingChart.options.plugins.tooltip.bodyColor = labelColor;
+
+      chargingPricingChart.update();
+    }
+
+    /* ==========================================================================
+       D. SLIDER LOGIC & STATE BINDING (SUM TO 100%)
        ========================================================================== */
     function handleSliderChange(source) {
       if (isApplied) {
@@ -1124,7 +1239,7 @@
     }
 
     /* ==========================================================================
-       D. CHART.JS DUAL-AXIS CHART WITH V2G (-kW) & CURRENT TIME DASHED LINE
+       E. CHART.JS DUAL-AXIS CHART WITH V2G (-kW) & CURRENT TIME DASHED LINE
        ========================================================================== */
     const hoursLabels = ['12 PM', '1 PM', '2 PM (NOW)', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
     const electricityPrices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12];
@@ -1159,12 +1274,12 @@
           ctx.beginPath();
           ctx.setLineDash([5, 5]);
           ctx.lineWidth = 2;
-          ctx.strokeStyle = '#EF4444';
+          ctx.strokeStyle = '#E74C3C';
           ctx.moveTo(x, topY);
           ctx.lineTo(x, bottomY);
           ctx.stroke();
 
-          ctx.fillStyle = '#EF4444';
+          ctx.fillStyle = '#E74C3C';
           ctx.font = 'bold 10px Inter';
           ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
           ctx.restore();
@@ -1182,8 +1297,8 @@
             type: 'line',
             label: 'Grid Price ($/kWh)',
             data: electricityPrices,
-            borderColor: '#F59E0B',
-            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            borderColor: '#F4A340',
+            backgroundColor: 'rgba(244, 163, 64, 0.12)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
@@ -1196,12 +1311,14 @@
             data: getCalculatedLoad(),
             backgroundColor: function(context) {
               const val = context.raw;
-              // Electric Cyan (#22D3EE) for positive charging, Violet (#8B5CF6) for negative V2G discharging
-              return val < 0 ? 'rgba(139, 92, 246, 0.85)' : 'rgba(34, 211, 238, 0.75)';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              const cyanColor = isDark ? 'rgba(45, 212, 191, 0.75)' : 'rgba(40, 199, 193, 0.75)';
+              return val < 0 ? 'rgba(139, 92, 246, 0.85)' : cyanColor;
             },
             borderColor: function(context) {
               const val = context.raw;
-              return val < 0 ? '#8B5CF6' : '#22D3EE';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              return val < 0 ? '#8B5CF6' : (isDark ? '#2DD4BF' : '#28C7C1');
             },
             borderWidth: 1,
             borderRadius: 4,
@@ -1217,10 +1334,10 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#111827',
-            titleColor: '#F8FAFC',
-            bodyColor: '#CBD5E1',
-            borderColor: '#263449',
+            backgroundColor: '#FFFFFF',
+            titleColor: '#1F2937',
+            bodyColor: '#64748B',
+            borderColor: '#E5E7EB',
             borderWidth: 1,
             callbacks: {
               label: function(context) {
@@ -1235,25 +1352,25 @@
         },
         scales: {
           x: {
-            grid: { color: '#1E293B' },
-            ticks: { color: '#94A3B8', font: { family: 'Inter', size: 10 } }
+            grid: { color: '#EEF1F4' },
+            ticks: { color: '#64748B', font: { family: 'Inter', size: 10 } }
           },
           yPrice: {
             type: 'linear',
             position: 'left',
-            title: { display: true, text: 'Grid Price ($/kWh)', color: '#F59E0B', font: { weight: 'bold' } },
-            grid: { color: '#1E293B' },
-            ticks: { color: '#F59E0B', callback: (v) => '$' + v.toFixed(2) }
+            title: { display: true, text: 'Grid Price ($/kWh)', color: '#F4A340', font: { weight: 'bold' } },
+            grid: { color: '#EEF1F4' },
+            ticks: { color: '#F4A340', callback: (v) => '$' + v.toFixed(2) }
           },
           yLoad: {
             type: 'linear',
             position: 'right',
-            title: { display: true, text: 'Scheduled Load (kW)', color: '#22D3EE', font: { weight: 'bold' } },
+            title: { display: true, text: 'Scheduled Load (kW)', color: '#28C7C1', font: { weight: 'bold' } },
             min: -120,
             max: 300,
             grid: { drawOnChartArea: false },
             ticks: {
-              color: '#22D3EE',
+              color: '#28C7C1',
               callback: (v) => v < 0 ? v + ' kW (V2G)' : v + ' kW'
             }
           }
@@ -1262,7 +1379,7 @@
     });
 
     /* ==========================================================================
-       E. INTERACTIVE GRID STATUS TOGGLE PILL
+       F. INTERACTIVE GRID STATUS TOGGLE PILL
        ========================================================================== */
     function toggleGridStatus() {
       isGridConnected = !isGridConnected;
@@ -1281,7 +1398,7 @@
     }
 
     /* ==========================================================================
-       F. DYNAMIC AI REASONING ENGINE (STATE BINDING & SAVINGS CALCULATION)
+       G. DYNAMIC AI REASONING ENGINE (STATE BINDING & SAVINGS CALCULATION)
        ========================================================================== */
     function updateUI() {
       const costWeight = parseInt(costSlider.value);
@@ -1290,15 +1407,12 @@
       costValDisplay.textContent = costWeight + '%';
       longevityValDisplay.textContent = longevityWeight + '%';
 
-      // Dynamic calculation for Projected Nightly Financial Savings
       const calculatedSavings = Math.round(150 + (costWeight * 5.25));
       projectedSavingsVal.textContent = `$${calculatedSavings}.00`;
 
-      // Update Chart Load Data
       chargingPricingChart.data.datasets[1].data = getCalculatedLoad();
       chargingPricingChart.update();
 
-      // State Binding: Dynamically reflect exact strategy integer in AI Badge Title
       const dominantStrategy = costWeight >= 50 ? 'Cost Minimization' : 'Battery Longevity Protection';
       const dominantVal = costWeight >= 50 ? costWeight : longevityWeight;
       
@@ -1306,7 +1420,6 @@
         aiStatusBadge.textContent = `✨ Strategy: ${dominantStrategy} - ${dominantVal}%`;
       }
 
-      // Dynamic AI Text updating with exact slider integers
       let recText = '';
 
       if (!isGridConnected) {
@@ -1321,7 +1434,7 @@
     }
 
     /* ==========================================================================
-       G. INTERACTIVE ACCEPT STATE & TOAST NOTIFICATION
+       H. INTERACTIVE ACCEPT STATE & TOAST NOTIFICATION
        ========================================================================== */
     function acceptOptimization() {
       if (!isGridConnected) {
@@ -1351,7 +1464,7 @@
     }
 
     /* ==========================================================================
-       H. TELEMATICS TABLE RENDERER
+       I. TELEMATICS TABLE RENDERER
        ========================================================================== */
     function renderTelematicsTable(data) {
       telematicsTableBody.innerHTML = '';
@@ -1424,8 +1537,9 @@
 
     tableSearchInput.addEventListener('input', applyTableFilters);
 
-    // Initial Load
+    // Initial Load & Theme Manager Initialization
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       renderTelematicsTable(telematicsData);
       updateUI();
     });
