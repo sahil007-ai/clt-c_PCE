@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltAI - AI Energy & EV Fleet Optimization System</title>
+
+  <!-- Google Fonts: Outfit for modern headers, Inter for crisp legibility -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js CDN for Dual-Axis Chart with V2G Negative Bars & Custom Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. DESIGN SYSTEM & COLOR TOKENS
+       ========================================================================== */
+    :root {
+      --bg-main: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #162032;
+      --bg-input: #1f293d;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-indigo: #6366f1;
+      --accent-v2g: #818cf8;       /* Indigo for V2G Discharging */
+
+      /* Status Indicator Palette */
+      --status-green: #10b981;
+      --status-green-bg: rgba(16, 185, 129, 0.15);
+      --status-yellow: #f59e0b;
+      --status-yellow-bg: rgba(245, 158, 11, 0.15);
+      --status-red: #ef4444;
+      --status-red-bg: rgba(239, 68, 68, 0.15);
+
+      --border-color: rgba(255, 255, 255, 0.08);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ==========================================================================
+       2. HEADER & INTERACTIVE GRID STATUS TOGGLE
+       ========================================================================== */
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 0 15px var(--accent-cyan-glow);
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Interactive Grid Status Toggle Pill */
+    .grid-toggle-pill {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-smooth);
+    }
+
+    .grid-toggle-pill:hover {
+      transform: scale(1.04);
+    }
+
+    .grid-toggle-pill.disconnected {
+      background: var(--status-red-bg);
+      color: var(--status-red);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--status-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--status-green);
+      animation: pulse 2s infinite;
+    }
+
+    .grid-toggle-pill.disconnected .pulse-dot {
+      background-color: var(--status-red);
+      box-shadow: 0 0 8px var(--status-red);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Header Global Stats Navigation */
+    nav.nav-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .nav-stat-label {
+      font-size: 0.725rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .nav-stat-value {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       3. MAIN LAYOUT & KPI GRID
+       ========================================================================== */
+    main {
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-smooth);
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .kpi-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .kpi-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .kpi-num {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .kpi-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    /* Two-Column Responsive Layout */
+    .dashboard-body {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-column, .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Generic Card Shell */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.85rem;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-title-icon {
+      color: var(--accent-cyan);
+      font-size: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-subtitle {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       4. CHART & V2G VISUALIZATION
+       ========================================================================== */
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 340px;
+    }
+
+    .chart-legend-badge {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    /* ==========================================================================
+       5. TELEMATICS DATA TABLE
+       ========================================================================== */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.85rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.85rem;
+      width: 220px;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.4rem;
+      background: var(--bg-input);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    table.telematics-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    table.telematics-table th {
+      background: rgba(31, 41, 61, 0.6);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.725rem;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.telematics-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    table.telematics-table tbody tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .progress-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      width: 130px;
+    }
+
+    .progress-track {
+      flex-grow: 1;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-val {
+      font-weight: 600;
+      font-size: 0.775rem;
+      min-width: 32px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.725rem;
+      font-weight: 700;
+    }
+
+    .status-badge.healthy {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.warning {
+      background: var(--status-yellow-bg);
+      color: var(--status-yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge.critical {
+      background: var(--status-red-bg);
+      color: var(--status-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* ==========================================================================
+       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS (SUM TO 100%)
+       ========================================================================== */
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .slider-value-display {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.12);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-input);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    /* Strategy Presets Buttons */
+    .preset-btns {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .btn-preset {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-preset:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-main);
+    }
+
+    /* AI Action Center Card */
+    .ai-action-center {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border: 1px solid var(--accent-cyan-glow);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: var(--transition-smooth);
+    }
+
+    .ai-action-center.applied {
+      border-color: var(--status-green);
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.95));
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .ai-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .ai-action-center.applied .ai-badge {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .ai-recommendation-text {
+      font-size: 0.875rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.85rem;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    .ai-action-center.applied .ai-recommendation-text {
+      border-left-color: var(--status-green);
+    }
+
+    .btn-accept {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.8rem 1.2rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition-smooth);
+    }
+
+    .ai-action-center.applied .btn-accept {
+      background: var(--status-green);
+    }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      margin-top: auto;
+      background: rgba(17, 24, 39, 0.6);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       HEADER: Global Stats Top Right + Interactive Grid Status Toggle Top Left
+       ========================================================================== -->
+  <header>
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <div class="logo-text">VoltAI Optimization</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">AI Energy & EV Fleet Controller</div>
+        </div>
+
+        <!-- Interactive Grid Status Toggle Pill -->
+        <div id="gridStatusPill" class="grid-toggle-pill" onclick="toggleGridStatus()" title="Click to toggle Grid Connection status">
+          <span class="pulse-dot"></span>
+          <span id="gridStatusText">GRID SYNCHRONIZED</span>
+        </div>
+      </div>
+
+      <!-- Maintained Top Right Header Global Stats -->
+      <nav class="nav-stats">
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Active Fleet</span>
+          <span class="nav-stat-value">42 / 45 EVs</span>
+        </div>
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Avg Fleet SOC</span>
+          <span class="nav-stat-value" style="color: var(--status-green);">76%</span>
+        </div>
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Est. Today Savings</span>
+          <span class="nav-stat-value" style="color: var(--accent-cyan);">$1,420.50</span>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN DASHBOARD: KPI Grid + 2-Column Responsive Layout
+       ========================================================================== -->
+  <main>
+
+    <!-- Top KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Current Grid Rate</span>
+          <span class="kpi-num" style="color: var(--status-yellow);">$0.48 / kWh</span>
+          <span class="kpi-sub" style="color: var(--status-yellow);">Peak Rate Window (4-7 PM)</span>
+        </div>
+        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">📈</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Scheduled Net Load</span>
+          <span class="kpi-num" id="kpiNetLoad">180 kW</span>
+          <span class="kpi-sub" id="kpiV2gStatus" style="color: var(--accent-indigo);">Includes -80 kW V2G Feed-In</span>
+        </div>
+        <div class="kpi-icon-box" style="background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan);">⚡</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Battery Health (SOH)</span>
+          <span class="kpi-num" style="color: var(--status-green);">94.2%</span>
+          <span class="kpi-sub" style="color: var(--status-green);">+3.1% cycle life extension</span>
+        </div>
+        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">🔋</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">V2G Feed-In Revenue</span>
+          <span class="kpi-num" style="color: var(--accent-indigo);">$340.00</span>
+          <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
+        </div>
+        <div class="kpi-icon-box" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo);">🔄</div>
+      </div>
+    </section>
+
+    <!-- 2-Column Main Layout -->
+    <div class="dashboard-body">
+
+      <!-- LEFT COLUMN: Dual Axis Chart with V2G Negative Bars & Telematics Table -->
+      <div class="left-column">
+
+        <!-- Module 1: Central Dual-Axis Chart -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">📊</span>
+              <div>
+                <h2 class="card-title">Scheduled Fleet Load vs. Grid Price Forecast</h2>
+                <div class="card-subtitle">Visualizing V2G discharge (negative kW) during peak price window</div>
+              </div>
+            </div>
+            <!-- Legend Badges -->
+            <div class="chart-legend-badge">
+              <div class="legend-item"><span class="legend-box" style="background: #06b6d4;"></span> Charge (+kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: #818cf8;"></span> V2G Discharging (-kW)</div>
+              <div class="legend-item"><span class="legend-box" style="background: #f59e0b;"></span> Grid Rate ($/kWh)</div>
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="chargingPricingChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Module 2: EV Telematics Data Table -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">🚘</span>
+              <div>
+                <h2 class="card-title">EV Fleet Telematics & Battery Health</h2>
+                <div class="card-subtitle">Real-time State of Charge (SOC%), State of Health (SOH%), and Battery Temperature</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-controls">
+            <input type="text" id="tableSearch" class="search-box" placeholder="Search Vehicle ID or Group...">
+            <div class="filter-tabs">
+              <button class="tab-btn active" onclick="filterTable('ALL')">All EVs</button>
+              <button class="tab-btn" onclick="filterTable('HEALTHY')">Healthy</button>
+              <button class="tab-btn" onclick="filterTable('WARNING')">Warning</button>
+              <button class="tab-btn" onclick="filterTable('CRITICAL')">Critical</button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="telematics-table">
+              <thead>
+                <tr>
+                  <th>Vehicle ID</th>
+                  <th>Fleet Group</th>
+                  <th>State of Charge (SOC%)</th>
+                  <th>State of Health (SOH%)</th>
+                  <th>Battery Temp</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="telematicsTableBody">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: AI Optimization Control Engine & Action Center -->
+      <div class="right-column">
+
+        <!-- Module 3: AI Control Engine Sliders (Strict Sum to 100%) -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">🤖</span>
+              <div>
+                <h2 class="card-title">AI Optimization Control Engine</h2>
+                <div class="card-subtitle">Relative multi-objective trade-off weights (Sum = 100%)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <!-- Slider 1: Cost Minimization Weight -->
+            <div class="slider-item">
+              <div class="slider-header">
+                <span class="slider-label">Cost Minimization Weight</span>
+                <span class="slider-value-display" id="costValDisplay">70%</span>
+              </div>
+              <input type="range" id="costSlider" min="0" max="100" value="70" step="5" oninput="handleSliderChange('cost')">
+              <div style="font-size: 0.7rem; color: var(--text-muted);">
+                Prioritizes off-peak energy rates & peak V2G discharge revenues.
+              </div>
+            </div>
+
+            <!-- Slider 2: Battery Longevity Protection -->
+            <div class="slider-item">
+              <div class="slider-header">
+                <span class="slider-label">Battery Longevity Protection</span>
+                <span class="slider-value-display" id="longevityValDisplay">30%</span>
+              </div>
+              <input type="range" id="longevitySlider" min="0" max="100" value="30" step="5" oninput="handleSliderChange('longevity')">
+              <div style="font-size: 0.7rem; color: var(--text-muted);">
+                Limits high-current thermal stress and deep discharge cycles.
+              </div>
+            </div>
+
+            <!-- Maintained Strategy Presets Buttons -->
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Strategy Presets:</span>
+              <div class="preset-btns">
+                <button class="btn-preset" onclick="setPreset(85)">Max Savings</button>
+                <button class="btn-preset" onclick="setPreset(20)">Max Longevity</button>
+                <button class="btn-preset" onclick="setPreset(50)">Balanced</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Module 4: AI Action Center -->
+          <div id="aiActionCenter" class="ai-action-center">
+            <div class="ai-header-bar">
+              <span class="ai-badge" id="aiStatusBadge">✨ AI Recommendation Live</span>
+              <span style="font-size: 0.725rem; color: var(--text-muted);" id="aiTimestamp">Updated just now</span>
+            </div>
+
+            <p id="aiRecommendationText" class="ai-recommendation-text">
+              <!-- Dynamically populated by JS -->
+            </p>
+
+            <button id="btnAcceptOptimization" class="btn-accept" onclick="acceptOptimization()">
+              <span>Accept & Apply Optimization</span>
+              <span>→</span>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div style="max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>VoltAI Energy & EV Fleet Optimization System &copy; 2026</div>
+      <div style="color: var(--accent-cyan); font-weight: 600;">System Status: Operational</div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       JAVASCRIPT ENGINE & LOGIC
+       ========================================================================== */
+  -->
+  <script>
+    /* ==========================================================================
+       A. TELEMATICS DATA ARRAY
+       ========================================================================== */
+    const telematicsData = [
+      { id: 'EV-101', group: 'Delivery Logistics', soc: 35, soh: 94, temp: 28, status: 'HEALTHY' },
+      { id: 'EV-102', group: 'Executive Transit', soc: 82, soh: 98, temp: 25, status: 'HEALTHY' },
+      { id: 'EV-103', group: 'Service Fleet',    soc: 18, soh: 86, temp: 41, status: 'CRITICAL' },
+      { id: 'EV-104', group: 'Delivery Logistics', soc: 65, soh: 91, temp: 31, status: 'HEALTHY' },
+      { id: 'EV-105', group: 'Delivery Logistics', soc: 45, soh: 88, temp: 37, status: 'WARNING' },
+      { id: 'EV-106', group: 'Urban Express',     soc: 92, soh: 96, temp: 26, status: 'HEALTHY' },
+      { id: 'EV-107', group: 'Service Fleet',    soc: 28, soh: 84, temp: 39, status: 'WARNING' },
+      { id: 'EV-108', group: 'Urban Express',     soc: 76, soh: 93, temp: 32, status: 'HEALTHY' }
+    ];
+
+    /* ==========================================================================
+       B. GLOBAL STATE & DOM REFERENCES
+       ========================================================================== */
+    let isGridConnected = true; // Grid Synchronized vs Disconnected state
+    let isApplied = false;
+    let currentFilter = 'ALL';
+
+    const gridStatusPill = document.getElementById('gridStatusPill');
+    const gridStatusText = document.getElementById('gridStatusText');
+    const costSlider = document.getElementById('costSlider');
+    const longevitySlider = document.getElementById('longevitySlider');
+    const costValDisplay = document.getElementById('costValDisplay');
+    const longevityValDisplay = document.getElementById('longevityValDisplay');
+    const aiRecommendationText = document.getElementById('aiRecommendationText');
+    const aiActionCenter = document.getElementById('aiActionCenter');
+    const aiStatusBadge = document.getElementById('aiStatusBadge');
+    const btnAcceptOptimization = document.getElementById('btnAcceptOptimization');
+    const telematicsTableBody = document.getElementById('telematicsTableBody');
+    const tableSearchInput = document.getElementById('tableSearch');
+
+    /* ==========================================================================
+       C. SLIDER LOGIC CLARIFICATION (SUM TO 100%)
+       Ensures Cost Minimization + Battery Longevity always equal 100%
+       ========================================================================== */
+    function handleSliderChange(source) {
+      if (source === 'cost') {
+        const costVal = parseInt(costSlider.value);
+        longevitySlider.value = 100 - costVal;
+      } else if (source === 'longevity') {
+        const longevityVal = parseInt(longevitySlider.value);
+        costSlider.value = 100 - longevityVal;
+      }
+      updateUI();
+    }
+
+    function setPreset(costVal) {
+      costSlider.value = costVal;
+      longevitySlider.value = 100 - costVal;
+      updateUI();
+    }
+
+    /* ==========================================================================
+       D. CHART.JS DUAL-AXIS CHART WITH V2G (-kW) & CURRENT TIME DASHED LINE
+       ========================================================================== */
+    const hoursLabels = ['12 PM', '1 PM', '2 PM (NOW)', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
+    const electricityPrices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12];
+
+    // Baseline Load Schedule: Negative values (-80 kW, -60 kW) represent V2G discharge during peak hours (4-6 PM)
+    function getCalculatedLoad() {
+      if (!isGridConnected) {
+        // Flat, safe fallback charging schedule when grid is disconnected (ignores grid price curve)
+        return [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
+      }
+
+      const costWeight = parseInt(costSlider.value);
+      if (costWeight >= 60) {
+        // High Cost Minimization: Aggressive V2G Discharging back to grid during peak pricing hours!
+        return [120, 150, 180, 80, -80, -100, -60, 40, 140, 220, 260, 240];
+      } else if (costWeight <= 40) {
+        // High Longevity Focus: Minimal V2G discharge to prevent battery cycling, steady moderate charging
+        return [100, 110, 120, 100, 20, 10, 20, 60, 100, 140, 160, 150];
+      } else {
+        // Balanced Strategy
+        return [110, 130, 150, 90, -40, -50, -20, 50, 120, 180, 210, 200];
+      }
+    }
+
+    // Custom Plugin: Draw Vertical Dashed Line for "CURRENT TIME" at index 2 (2 PM)
+    const currentTimePlugin = {
+      id: 'currentTimeLine',
+      afterDraw: (chart) => {
+        const meta = chart.getDatasetMeta(1);
+        const targetIndex = 2; // '2 PM (NOW)' label index
+        if (meta.data[targetIndex]) {
+          const x = meta.data[targetIndex].x;
+          const topY = chart.scales.yPrice.top;
+          const bottomY = chart.scales.yPrice.bottom;
+          const ctx = chart.ctx;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([5, 5]);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#ef4444'; // Red dashed line
+          ctx.moveTo(x, topY);
+          ctx.lineTo(x, bottomY);
+          ctx.stroke();
+
+          // Label
+          ctx.fillStyle = '#ef4444';
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
+          ctx.restore();
+        }
+      }
+    };
+
+    const ctx = document.getElementById('chargingPricingChart').getContext('2d');
+    const chargingPricingChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: hoursLabels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Grid Price ($/kWh)',
+            data: electricityPrices,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yPrice',
+            pointRadius: 4
+          },
+          {
+            type: 'bar',
+            label: 'Scheduled Fleet Load (kW)',
+            data: getCalculatedLoad(),
+            backgroundColor: function(context) {
+              const val = context.raw;
+              // Cyan for positive charging, Indigo/Purple for negative V2G discharging
+              return val < 0 ? 'rgba(129, 140, 248, 0.85)' : 'rgba(6, 182, 212, 0.7)';
+            },
+            borderColor: function(context) {
+              const val = context.raw;
+              return val < 0 ? '#818cf8' : '#06b6d4';
+            },
+            borderWidth: 1,
+            borderRadius: 4,
+            yAxisID: 'yLoad'
+          }
+        ]
+      },
+      plugins: [currentTimePlugin],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            callbacks: {
+              label: function(context) {
+                if (context.dataset.label.includes('Load')) {
+                  const val = context.raw;
+                  if (val < 0) {
+                    return ` 🔄 V2G Feed-In Discharge: ${val} kW (Selling to Grid)`;
+                  } else {
+                    return ` ⚡ Fleet Charging Draw: ${val} kW`;
+                  }
+                }
+                return ` 📈 Grid Price: $${context.raw.toFixed(2)}/kWh`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+          },
+          yPrice: {
+            type: 'linear',
+            position: 'left',
+            title: { display: true, text: 'Grid Price ($/kWh)', color: '#f59e0b', font: { weight: 'bold' } },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: '#f59e0b', callback: (v) => '$' + v.toFixed(2) }
+          },
+          yLoad: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Scheduled Load (kW)', color: '#06b6d4', font: { weight: 'bold' } },
+            min: -120, // Negative lower bound to display V2G discharging
+            max: 300,
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: '#06b6d4',
+              callback: (v) => v < 0 ? v + ' kW (V2G)' : v + ' kW'
+            }
+          }
+        }
+      }
+    });
+
+    /* ==========================================================================
+       E. INTERACTIVE GRID STATUS TOGGLE PILL
+       Toggles between Grid Synchronized (Green) and Grid Disconnected (Red).
+       When disconnected, updates central chart to a flat safe fallback schedule.
+       ========================================================================== */
+    function toggleGridStatus() {
+      isGridConnected = !isGridConnected;
+
+      if (isGridConnected) {
+        gridStatusPill.className = 'grid-toggle-pill';
+        gridStatusText.textContent = 'GRID SYNCHRONIZED';
+      } else {
+        gridStatusPill.className = 'grid-toggle-pill disconnected';
+        gridStatusText.textContent = 'GRID DISCONNECTED';
+      }
+
+      updateUI();
+    }
+
+    /* ==========================================================================
+       F. DYNAMIC UI & RECOMMENDATION TEXT UPDATE
+       ========================================================================== */
+    function updateUI() {
+      const costWeight = parseInt(costSlider.value);
+      const longevityWeight = parseInt(longevitySlider.value);
+
+      costValDisplay.textContent = costWeight + '%';
+      longevityValDisplay.textContent = longevityWeight + '%';
+
+      // Update Chart Load Data
+      chargingPricingChart.data.datasets[1].data = getCalculatedLoad();
+      chargingPricingChart.update();
+
+      // Update AI Recommendation Text
+      let recText = '';
+
+      if (!isGridConnected) {
+        recText = `<strong>⚠️ GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. VoltAI has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
+      } else if (costWeight >= 60) {
+        recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With your <strong>${costWeight}% Cost Weight</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, earning <strong>$340.00</strong> in feed-in revenue before shifting fleet charging to 2:00 AM off-peak rates.`;
+      } else if (longevityWeight >= 60) {
+        recText = `Battery telematics indicate elevated cell temperatures on 2 service EVs. With your <strong>${longevityWeight}% Battery Longevity Protection Weight</strong>, V2G deep discharge is disabled and charging rates are capped at 40 kW to eliminate thermal stress.`;
+      } else {
+        recText = `Balanced Fleet Strategy active (<strong>${costWeight}% Cost / ${longevityWeight}% Longevity</strong>). Moderate V2G discharge (-50 kW) is scheduled during peak grid pricing hours, balancing energy cost arbitrage with battery cycle preservation.`;
+      }
+
+      aiRecommendationText.innerHTML = recText;
+
+      // Reset applied button state if sliders change
+      if (isApplied) {
+        aiActionCenter.classList.remove('applied');
+        aiStatusBadge.textContent = '✨ AI Recommendation Live';
+        btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
+        isApplied = false;
+      }
+    }
+
+    function acceptOptimization() {
+      if (!isGridConnected) {
+        alert("⚠️ Cannot enforce dynamic AI schedule while Grid is Disconnected. Re-enable Grid Synchronized status first.");
+        return;
+      }
+
+      alert("✅ AI Optimization & V2G Discharge Schedule Successfully Accepted!\n\nFleet V2G feed-in inverters and smart chargers have been updated.");
+      aiActionCenter.classList.add('applied');
+      aiStatusBadge.textContent = '✓ OPTIMIZATION ACTIVE & ENFORCED';
+      btnAcceptOptimization.innerHTML = `<span>Optimization Applied Successfully</span> <span>✓</span>`;
+      isApplied = true;
+    }
+
+    /* ==========================================================================
+       G. TELEMATICS TABLE RENDERER
+       ========================================================================== */
+    function renderTelematicsTable(data) {
+      telematicsTableBody.innerHTML = '';
+
+      if (data.length === 0) {
+        telematicsTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No EV records match criteria.</td></tr>`;
+        return;
+      }
+
+      data.forEach(vehicle => {
+        const tr = document.createElement('tr');
+        let statusBadgeHtml = '';
+        let progressColor = 'var(--status-green)';
+
+        if (vehicle.status === 'HEALTHY') {
+          statusBadgeHtml = `<span class="status-badge healthy">● Healthy</span>`;
+          progressColor = 'var(--status-green)';
+        } else if (vehicle.status === 'WARNING') {
+          statusBadgeHtml = `<span class="status-badge warning">▲ Throttled</span>`;
+          progressColor = 'var(--status-yellow)';
+        } else {
+          statusBadgeHtml = `<span class="status-badge critical">✖ Critical / Hot</span>`;
+          progressColor = 'var(--status-red)';
+        }
+
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: var(--text-main);">${vehicle.id}</td>
+          <td style="color: var(--text-muted);">${vehicle.group}</td>
+          <td>
+            <div class="progress-bar-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" style="width: ${vehicle.soc}%; background-color: ${progressColor};"></div>
+              </div>
+              <span class="progress-val">${vehicle.soc}%</span>
+            </div>
+          </td>
+          <td>
+            <div class="progress-bar-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" style="width: ${vehicle.soh}%; background-color: var(--accent-cyan);"></div>
+              </div>
+              <span class="progress-val">${vehicle.soh}%</span>
+            </div>
+          </td>
+          <td style="font-weight: 600; color: ${vehicle.temp > 40 ? 'var(--status-red)' : 'var(--text-main)'};">${vehicle.temp}°C</td>
+          <td>${statusBadgeHtml}</td>
+        `;
+        telematicsTableBody.appendChild(tr);
+      });
+    }
+
+    function filterTable(status) {
+      currentFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toUpperCase().includes(status)) btn.classList.add('active');
+      });
+      applyTableFilters();
+    }
+
+    function applyTableFilters() {
+      const term = tableSearchInput.value.toLowerCase().trim();
+      const filtered = telematicsData.filter(item => {
+        const matchesStatus = (currentFilter === 'ALL') || (item.status === currentFilter);
+        const matchesSearch = item.id.toLowerCase().includes(term) || item.group.toLowerCase().includes(term);
+        return matchesStatus && matchesSearch;
+      });
+      renderTelematicsTable(filtered);
+    }
+
+    tableSearchInput.addEventListener('input', applyTableFilters);
+
+    // Initial Load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTelematicsTable(telematicsData);
+      updateUI();
+    });
+  </script>
+</body>
+</html>
