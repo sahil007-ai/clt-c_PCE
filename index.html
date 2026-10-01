@@ -496,7 +496,7 @@
     }
 
     /* ==========================================================================
-       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS (SUM TO 100%)
+       6. AI OPTIMIZATION CONTROL ENGINE & SLIDERS (DYNAMIC STATE BINDING)
        ========================================================================== */
     .slider-group {
       display: flex;
@@ -506,6 +506,12 @@
       padding: 1.25rem;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
+      transition: var(--transition-smooth);
+    }
+
+    .slider-group.disabled {
+      opacity: 0.55;
+      pointer-events: none;
     }
 
     .slider-item {
@@ -543,6 +549,10 @@
       background: var(--bg-input);
       outline: none;
       cursor: pointer;
+    }
+
+    input[type="range"]:disabled {
+      cursor: not-allowed;
     }
 
     input[type="range"]::-webkit-slider-thumb {
@@ -591,12 +601,13 @@
       flex-direction: column;
       gap: 1rem;
       transition: var(--transition-smooth);
+      position: relative;
     }
 
     .ai-action-center.applied {
       border-color: var(--status-green);
-      background: linear-gradient(145deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.95));
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.45), rgba(15, 23, 42, 0.95));
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
     }
 
     .ai-header-bar {
@@ -609,10 +620,10 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      background: rgba(99, 102, 241, 0.2);
-      color: #a5b4fc;
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      padding: 0.2rem 0.6rem;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      padding: 0.25rem 0.65rem;
       border-radius: 20px;
       font-size: 0.725rem;
       font-weight: 700;
@@ -622,7 +633,40 @@
     .ai-action-center.applied .ai-badge {
       background: var(--status-green-bg);
       color: var(--status-green);
-      border-color: rgba(16, 185, 129, 0.4);
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+
+    /* Dynamic Projected Metrics Row in AI Action Center */
+    .ai-metrics-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .ai-metric-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-metric-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .ai-metric-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+    }
+
+    .ai-action-center.applied .ai-metric-val {
+      color: var(--status-green);
     }
 
     .ai-recommendation-text {
@@ -644,7 +688,7 @@
       color: #ffffff;
       border: none;
       border-radius: var(--radius-sm);
-      padding: 0.8rem 1.2rem;
+      padding: 0.85rem 1.2rem;
       font-family: 'Outfit', sans-serif;
       font-size: 0.9rem;
       font-weight: 700;
@@ -654,10 +698,47 @@
       justify-content: center;
       gap: 0.5rem;
       transition: var(--transition-smooth);
+      box-shadow: 0 4px 15px var(--accent-cyan-glow);
+    }
+
+    .btn-accept:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
     }
 
     .ai-action-center.applied .btn-accept {
       background: var(--status-green);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Floating Toast Success Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1.5rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     footer {
@@ -673,6 +754,12 @@
 </head>
 
 <body>
+
+  <!-- Floating Toast Notification Banner -->
+  <div id="toastNotification" class="toast-notification">
+    <span>✅</span>
+    <span id="toastMessage">Schedule Synchronized with Fleet</span>
+  </div>
 
   <!-- ==========================================================================
        HEADER: Global Stats Top Right + Interactive Grid Status Toggle Top Left
@@ -830,7 +917,7 @@
       <!-- RIGHT COLUMN: AI Optimization Control Engine & Action Center -->
       <div class="right-column">
 
-        <!-- Module 3: AI Control Engine Sliders (Strict Sum to 100%) -->
+        <!-- Module 3: AI Control Engine Sliders (Dynamic State Binding) -->
         <section class="card">
           <div class="card-header">
             <div class="card-title-group">
@@ -842,7 +929,7 @@
             </div>
           </div>
 
-          <div class="slider-group">
+          <div id="sliderContainer" class="slider-group">
             <!-- Slider 1: Cost Minimization Weight -->
             <div class="slider-item">
               <div class="slider-header">
@@ -878,11 +965,23 @@
             </div>
           </div>
 
-          <!-- Module 4: AI Action Center -->
+          <!-- Module 4: AI Action Center with Dynamic State Binding -->
           <div id="aiActionCenter" class="ai-action-center">
             <div class="ai-header-bar">
-              <span class="ai-badge" id="aiStatusBadge">✨ AI Recommendation Live</span>
+              <span class="ai-badge" id="aiStatusBadge">✨ Strategy: Cost Minimization - 70%</span>
               <span style="font-size: 0.725rem; color: var(--text-muted);" id="aiTimestamp">Updated just now</span>
+            </div>
+
+            <!-- Dynamic Projected Impact Metrics Row -->
+            <div class="ai-metrics-row">
+              <div class="ai-metric-item">
+                <span class="ai-metric-label">Projected Nightly Savings</span>
+                <span class="ai-metric-val" id="projectedSavingsVal">$517.50</span>
+              </div>
+              <div class="ai-metric-item">
+                <span class="ai-metric-label">V2G Feed-In Revenue</span>
+                <span class="ai-metric-val" id="v2gRevenueVal" style="color: var(--accent-v2g);">$340.00</span>
+              </div>
             </div>
 
             <p id="aiRecommendationText" class="ai-recommendation-text">
@@ -938,20 +1037,28 @@
     const gridStatusText = document.getElementById('gridStatusText');
     const costSlider = document.getElementById('costSlider');
     const longevitySlider = document.getElementById('longevitySlider');
+    const sliderContainer = document.getElementById('sliderContainer');
     const costValDisplay = document.getElementById('costValDisplay');
     const longevityValDisplay = document.getElementById('longevityValDisplay');
     const aiRecommendationText = document.getElementById('aiRecommendationText');
     const aiActionCenter = document.getElementById('aiActionCenter');
     const aiStatusBadge = document.getElementById('aiStatusBadge');
     const btnAcceptOptimization = document.getElementById('btnAcceptOptimization');
+    const projectedSavingsVal = document.getElementById('projectedSavingsVal');
     const telematicsTableBody = document.getElementById('telematicsTableBody');
     const tableSearchInput = document.getElementById('tableSearch');
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
 
     /* ==========================================================================
-       C. SLIDER LOGIC CLARIFICATION (SUM TO 100%)
-       Ensures Cost Minimization + Battery Longevity always equal 100%
+       C. SLIDER LOGIC & STATE BINDING (SUM TO 100%)
        ========================================================================== */
     function handleSliderChange(source) {
+      if (isApplied) {
+        // Unlock sliders if user interacts again
+        unlockSliders();
+      }
+
       if (source === 'cost') {
         const costVal = parseInt(costSlider.value);
         longevitySlider.value = 100 - costVal;
@@ -963,9 +1070,21 @@
     }
 
     function setPreset(costVal) {
+      if (isApplied) {
+        unlockSliders();
+      }
       costSlider.value = costVal;
       longevitySlider.value = 100 - costVal;
       updateUI();
+    }
+
+    function unlockSliders() {
+      costSlider.disabled = false;
+      longevitySlider.disabled = false;
+      sliderContainer.classList.remove('disabled');
+      aiActionCenter.classList.remove('applied');
+      btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
+      isApplied = false;
     }
 
     /* ==========================================================================
@@ -974,32 +1093,26 @@
     const hoursLabels = ['12 PM', '1 PM', '2 PM (NOW)', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
     const electricityPrices = [0.18, 0.22, 0.26, 0.35, 0.48, 0.52, 0.46, 0.40, 0.30, 0.22, 0.15, 0.12];
 
-    // Baseline Load Schedule: Negative values (-80 kW, -60 kW) represent V2G discharge during peak hours (4-6 PM)
     function getCalculatedLoad() {
       if (!isGridConnected) {
-        // Flat, safe fallback charging schedule when grid is disconnected (ignores grid price curve)
         return [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40];
       }
 
       const costWeight = parseInt(costSlider.value);
       if (costWeight >= 60) {
-        // High Cost Minimization: Aggressive V2G Discharging back to grid during peak pricing hours!
         return [120, 150, 180, 80, -80, -100, -60, 40, 140, 220, 260, 240];
       } else if (costWeight <= 40) {
-        // High Longevity Focus: Minimal V2G discharge to prevent battery cycling, steady moderate charging
         return [100, 110, 120, 100, 20, 10, 20, 60, 100, 140, 160, 150];
       } else {
-        // Balanced Strategy
         return [110, 130, 150, 90, -40, -50, -20, 50, 120, 180, 210, 200];
       }
     }
 
-    // Custom Plugin: Draw Vertical Dashed Line for "CURRENT TIME" at index 2 (2 PM)
     const currentTimePlugin = {
       id: 'currentTimeLine',
       afterDraw: (chart) => {
         const meta = chart.getDatasetMeta(1);
-        const targetIndex = 2; // '2 PM (NOW)' label index
+        const targetIndex = 2; // '2 PM (NOW)'
         if (meta.data[targetIndex]) {
           const x = meta.data[targetIndex].x;
           const topY = chart.scales.yPrice.top;
@@ -1010,12 +1123,11 @@
           ctx.beginPath();
           ctx.setLineDash([5, 5]);
           ctx.lineWidth = 2;
-          ctx.strokeStyle = '#ef4444'; // Red dashed line
+          ctx.strokeStyle = '#ef4444';
           ctx.moveTo(x, topY);
           ctx.lineTo(x, bottomY);
           ctx.stroke();
 
-          // Label
           ctx.fillStyle = '#ef4444';
           ctx.font = 'bold 10px Inter';
           ctx.fillText('▼ CURRENT TIME', x - 38, topY - 6);
@@ -1048,7 +1160,6 @@
             data: getCalculatedLoad(),
             backgroundColor: function(context) {
               const val = context.raw;
-              // Cyan for positive charging, Indigo/Purple for negative V2G discharging
               return val < 0 ? 'rgba(129, 140, 248, 0.85)' : 'rgba(6, 182, 212, 0.7)';
             },
             borderColor: function(context) {
@@ -1076,11 +1187,7 @@
               label: function(context) {
                 if (context.dataset.label.includes('Load')) {
                   const val = context.raw;
-                  if (val < 0) {
-                    return ` 🔄 V2G Feed-In Discharge: ${val} kW (Selling to Grid)`;
-                  } else {
-                    return ` ⚡ Fleet Charging Draw: ${val} kW`;
-                  }
+                  return val < 0 ? ` 🔄 V2G Feed-In Discharge: ${val} kW (Selling to Grid)` : ` ⚡ Fleet Charging Draw: ${val} kW`;
                 }
                 return ` 📈 Grid Price: $${context.raw.toFixed(2)}/kWh`;
               }
@@ -1103,7 +1210,7 @@
             type: 'linear',
             position: 'right',
             title: { display: true, text: 'Scheduled Load (kW)', color: '#06b6d4', font: { weight: 'bold' } },
-            min: -120, // Negative lower bound to display V2G discharging
+            min: -120,
             max: 300,
             grid: { drawOnChartArea: false },
             ticks: {
@@ -1117,8 +1224,6 @@
 
     /* ==========================================================================
        E. INTERACTIVE GRID STATUS TOGGLE PILL
-       Toggles between Grid Synchronized (Green) and Grid Disconnected (Red).
-       When disconnected, updates central chart to a flat safe fallback schedule.
        ========================================================================== */
     function toggleGridStatus() {
       isGridConnected = !isGridConnected;
@@ -1126,16 +1231,18 @@
       if (isGridConnected) {
         gridStatusPill.className = 'grid-toggle-pill';
         gridStatusText.textContent = 'GRID SYNCHRONIZED';
+        showToast("Grid Telematics Synchronized", "success");
       } else {
         gridStatusPill.className = 'grid-toggle-pill disconnected';
         gridStatusText.textContent = 'GRID DISCONNECTED';
+        showToast("Grid Connection Disconnected - Safe Fallback Active", "warning");
       }
 
       updateUI();
     }
 
     /* ==========================================================================
-       F. DYNAMIC UI & RECOMMENDATION TEXT UPDATE
+       F. DYNAMIC AI REASONING ENGINE (STATE BINDING & SAVINGS CALCULATION)
        ========================================================================== */
     function updateUI() {
       const costWeight = parseInt(costSlider.value);
@@ -1144,49 +1251,71 @@
       costValDisplay.textContent = costWeight + '%';
       longevityValDisplay.textContent = longevityWeight + '%';
 
+      // Dynamic calculation for Projected Nightly Financial Savings
+      const calculatedSavings = Math.round(150 + (costWeight * 5.25));
+      projectedSavingsVal.textContent = `$${calculatedSavings}.00`;
+
       // Update Chart Load Data
       chargingPricingChart.data.datasets[1].data = getCalculatedLoad();
       chargingPricingChart.update();
 
-      // Update AI Recommendation Text
+      // State Binding: Dynamically reflect exact strategy integer in AI Badge Title
+      const dominantStrategy = costWeight >= 50 ? 'Cost Minimization' : 'Battery Longevity Protection';
+      const dominantVal = costWeight >= 50 ? costWeight : longevityWeight;
+      
+      if (!isApplied) {
+        aiStatusBadge.textContent = `✨ Strategy: ${dominantStrategy} - ${dominantVal}%`;
+      }
+
+      // Dynamic AI Text updating with exact slider integers
       let recText = '';
 
       if (!isGridConnected) {
         recText = `<strong>⚠️ GRID DISCONNECTED PROTOCOL ACTIVE:</strong> Grid telemetry link lost. VoltAI has safely overridden AI pricing schedules and initiated a <strong>flat 40 kW fallback charging rate</strong> across all hubs. V2G discharge is temporarily disabled.`;
-      } else if (costWeight >= 60) {
-        recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With your <strong>${costWeight}% Cost Weight</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, earning <strong>$340.00</strong> in feed-in revenue before shifting fleet charging to 2:00 AM off-peak rates.`;
-      } else if (longevityWeight >= 60) {
-        recText = `Battery telematics indicate elevated cell temperatures on 2 service EVs. With your <strong>${longevityWeight}% Battery Longevity Protection Weight</strong>, V2G deep discharge is disabled and charging rates are capped at 40 kW to eliminate thermal stress.`;
+      } else if (costWeight >= 50) {
+        recText = `Grid prices peak at <strong>$0.52/kWh</strong> between 4:00 PM and 6:00 PM. With <strong>Strategy: Cost Minimization - ${costWeight}%</strong>, the AI engine has scheduled <strong>Vehicle-to-Grid (V2G) discharge up to -100 kW</strong> during peak hours, generating <strong>$340.00</strong> in V2G revenues and yielding <strong>$${calculatedSavings}.00</strong> in projected nightly savings.`;
       } else {
-        recText = `Balanced Fleet Strategy active (<strong>${costWeight}% Cost / ${longevityWeight}% Longevity</strong>). Moderate V2G discharge (-50 kW) is scheduled during peak grid pricing hours, balancing energy cost arbitrage with battery cycle preservation.`;
+        recText = `Battery telematics indicate elevated cell temperatures on 2 service EVs. With <strong>Strategy: Battery Longevity Protection - ${longevityWeight}%</strong>, V2G deep discharge is throttled and charging rates are capped at 40 kW to eliminate thermal degradation while yielding <strong>$${calculatedSavings}.00</strong> in projected savings.`;
       }
 
       aiRecommendationText.innerHTML = recText;
-
-      // Reset applied button state if sliders change
-      if (isApplied) {
-        aiActionCenter.classList.remove('applied');
-        aiStatusBadge.textContent = '✨ AI Recommendation Live';
-        btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
-        isApplied = false;
-      }
-    }
-
-    function acceptOptimization() {
-      if (!isGridConnected) {
-        alert("⚠️ Cannot enforce dynamic AI schedule while Grid is Disconnected. Re-enable Grid Synchronized status first.");
-        return;
-      }
-
-      alert("✅ AI Optimization & V2G Discharge Schedule Successfully Accepted!\n\nFleet V2G feed-in inverters and smart chargers have been updated.");
-      aiActionCenter.classList.add('applied');
-      aiStatusBadge.textContent = '✓ OPTIMIZATION ACTIVE & ENFORCED';
-      btnAcceptOptimization.innerHTML = `<span>Optimization Applied Successfully</span> <span>✓</span>`;
-      isApplied = true;
     }
 
     /* ==========================================================================
-       G. TELEMATICS TABLE RENDERER
+       G. INTERACTIVE ACCEPT STATE & TOAST NOTIFICATION
+       ========================================================================== */
+    function acceptOptimization() {
+      if (!isGridConnected) {
+        showToast("⚠️ Cannot deploy AI schedule while Grid is Disconnected", "warning");
+        return;
+      }
+
+      // Visually lock sliders to simulate schedule deployment
+      costSlider.disabled = true;
+      longevitySlider.disabled = true;
+      sliderContainer.classList.add('disabled');
+
+      // Update AI Card visuals to Green Applied State
+      aiActionCenter.classList.add('applied');
+      aiStatusBadge.textContent = '✓ Schedule Synchronized with Fleet';
+      btnAcceptOptimization.innerHTML = `<span>Schedule Deployed & Enforced</span> <span>✓</span>`;
+      isApplied = true;
+
+      // Trigger floating success toast notification
+      showToast("Schedule Synchronized with Fleet", "success");
+    }
+
+    function showToast(message, type = "success") {
+      toastMessage.textContent = message;
+      toastNotification.className = "toast-notification show";
+
+      setTimeout(() => {
+        toastNotification.className = "toast-notification";
+      }, 3500);
+    }
+
+    /* ==========================================================================
+       H. TELEMATICS TABLE RENDERER
        ========================================================================== */
     function renderTelematicsTable(data) {
       telematicsTableBody.innerHTML = '';
