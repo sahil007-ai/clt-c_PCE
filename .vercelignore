@@ -1,0 +1,16 @@
+# Ignore Python backend from Vercel static deployment
+app.py
+requirements.txt
+.deps/
+.venv/
+__pycache__/
+*.py
+agent/
+engine/
+live/
+evaluation/
+scripts/
+tests/
+saved_outputs/
+.env
+.env.example
