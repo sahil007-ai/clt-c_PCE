@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltAI - AI Energy & EV Fleet Optimization System</title>
+
+  <!-- Google Fonts: Outfit for sleek modern headings, Inter for high legibility body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js via CDN for Dual-Axis Pricing & Charging Graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. CSS DESIGN SYSTEM & TOKENS
+       Dark theme palette featuring deep charcoal backdrops, glassmorphism cards,
+       and strict status colors (Green = Healthy, Yellow = Warning, Red = Critical)
+       ========================================================================== */
+    :root {
+      /* Background Colors */
+      --bg-main: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #162032;
+      --bg-input: #1f293d;
+
+      /* Text Colors */
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      /* Brand Accents */
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-indigo: #6366f1;
+
+      /* Status Indicators (Required Color Palette) */
+      --status-green: #10b981;      /* Healthy / Available */
+      --status-green-bg: rgba(16, 185, 129, 0.12);
+      --status-yellow: #f59e0b;     /* Warning / Throttled */
+      --status-yellow-bg: rgba(245, 158, 11, 0.12);
+      --status-red: #ef4444;        /* Critical / High Rate */
+      --status-red-bg: rgba(239, 68, 68, 0.12);
+
+      /* Structural UI Elements */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(6, 182, 212, 0.4);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --transition-fast: all 0.2s ease-in-out;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset & Base Setup */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+    }
+
+    h1, h2, h3, h4, .brand-font {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ==========================================================================
+       2. HEADER & NAVIGATION (SEMANTIC TAGS)
+       ========================================================================== */
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 0 15px var(--accent-cyan-glow);
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-badge {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--status-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--status-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Navigation Bar Quick Metrics */
+    nav.nav-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .nav-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       3. MAIN LAYOUT & KPI SUMMARY DASHBOARD
+       ========================================================================== */
+    main {
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Top KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-smooth);
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .kpi-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .kpi-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .kpi-num {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .kpi-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    /* Main Content Two-Column Layout (Chart & Table on Left, AI Engine on Right) */
+    .dashboard-body {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-column, .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Card Shell Styling */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-title-icon {
+      color: var(--accent-cyan);
+      font-size: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       4. CHART.JS DUAL-AXIS MODULE
+       ========================================================================== */
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 320px;
+    }
+
+    /* ==========================================================================
+       5. TELEMATICS DATA TABLE MODULE
+       ========================================================================== */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.85rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.85rem;
+      width: 220px;
+      transition: var(--transition-fast);
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg-input);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    table.telematics-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    table.telematics-table th {
+      background: rgba(31, 41, 61, 0.6);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.telematics-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    table.telematics-table tbody tr {
+      transition: var(--transition-fast);
+    }
+
+    table.telematics-table tbody tr:hover {
+      background: var(--bg-card-hover);
+    }
+
+    /* Progress bar in table for SOC & SOH */
+    .progress-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 140px;
+    }
+
+    .progress-track {
+      flex-grow: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .progress-val {
+      font-weight: 600;
+      font-size: 0.8rem;
+      min-width: 35px;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .status-badge.healthy {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.warning {
+      background: var(--status-yellow-bg);
+      color: var(--status-yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge.critical {
+      background: var(--status-red-bg);
+      color: var(--status-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* ==========================================================================
+       6. AI OPTIMIZATION PANEL & SLIDERS
+       ========================================================================== */
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .slider-value-display {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    /* Custom Styled Range Input */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-input);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* AI Action Center Card */
+    .ai-action-center {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border: 1px solid var(--accent-cyan-glow);
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    /* Applied / Healthy State Class for AI Card */
+    .ai-action-center.applied {
+      border-color: var(--status-green);
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.95));
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .ai-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .ai-action-center.applied .ai-badge {
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .ai-recommendation-text {
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--accent-cyan);
+      transition: var(--transition-fast);
+    }
+
+    .ai-action-center.applied .ai-recommendation-text {
+      border-left-color: var(--status-green);
+    }
+
+    /* Action Center Dynamic Metrics Row */
+    .ai-impact-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .ai-impact-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.6rem 0.4rem;
+      border-radius: 8px;
+    }
+
+    .ai-impact-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+    }
+
+    .ai-action-center.applied .ai-impact-val {
+      color: var(--status-green);
+    }
+
+    .ai-impact-lbl {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Accept Button */
+    .btn-accept {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.2rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 15px var(--accent-cyan-glow);
+    }
+
+    .btn-accept:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-accept:active {
+      transform: translateY(0);
+    }
+
+    .ai-action-center.applied .btn-accept {
+      background: var(--status-green);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Preset Quick Buttons */
+    .preset-btns {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-preset {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .btn-preset:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       7. FOOTER & HELPER STYLES
+       ========================================================================== */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      margin-top: auto;
+      background: rgba(17, 24, 39, 0.6);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .footer-content {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       HEADER: Semantic navigation header with live system indicators
+       ========================================================================== -->
+  <header>
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <div class="logo-text">VoltAI Optimization</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">AI Energy & EV Fleet Controller</div>
+        </div>
+        <div class="logo-badge">
+          <span class="pulse-dot"></span>
+          GRID SYNCHRONIZED
+        </div>
+      </div>
+
+      <!-- Quick Metrics Nav Bar -->
+      <nav class="nav-stats">
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Active Fleet</span>
+          <span class="nav-stat-value">42 / 45 EVs</span>
+        </div>
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Avg Fleet SOC</span>
+          <span class="nav-stat-value" style="color: var(--status-green);">76%</span>
+        </div>
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Current Grid Rate</span>
+          <span class="nav-stat-value" style="color: var(--status-yellow);">$0.38 / kWh</span>
+        </div>
+        <div class="nav-stat-item">
+          <span class="nav-stat-label">Est. Today Savings</span>
+          <span class="nav-stat-value" style="color: var(--accent-cyan);">$1,420.50</span>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN: Top KPI grid + 2-Column Responsive Dashboard Layout
+       ========================================================================== -->
+  <main>
+
+    <!-- Top KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Grid Pricing State</span>
+          <span class="kpi-num" style="color: var(--status-yellow);">PEAK RATE</span>
+          <span class="kpi-sub" style="color: var(--text-muted);">Off-Peak starts at 11:00 PM</span>
+        </div>
+        <div class="kpi-icon-box" style="background: var(--status-yellow-bg); color: var(--status-yellow);">📈</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Scheduled Charge Load</span>
+          <span class="kpi-num">180 kW</span>
+          <span class="kpi-sub" style="color: var(--status-green);">↓ 35% load shifted off-peak</span>
+        </div>
+        <div class="kpi-icon-box" style="background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan);">⚡</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">Fleet Battery Health (SOH)</span>
+          <span class="kpi-num" style="color: var(--status-green);">94.2%</span>
+          <span class="kpi-sub" style="color: var(--status-green);">+3.1% cycle life extension</span>
+        </div>
+        <div class="kpi-icon-box" style="background: var(--status-green-bg); color: var(--status-green);">🔋</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-info">
+          <span class="kpi-title">V2G Revenue (Feed-In)</span>
+          <span class="kpi-num" style="color: var(--accent-indigo);">$340.00</span>
+          <span class="kpi-sub" style="color: var(--text-muted);">Discharging 4 EVs to grid</span>
+        </div>
+        <div class="kpi-icon-box" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-indigo);">🔄</div>
+      </div>
+    </section>
+
+    <!-- 2-Column Dashboard Body -->
+    <div class="dashboard-body">
+
+      <!-- LEFT COLUMN: Dual Axis Chart & Dynamic Telematics Data Table -->
+      <div class="left-column">
+
+        <!-- Module 1: Charging vs. Pricing Chart (Chart.js Dual-Axis) -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">📊</span>
+              <div>
+                <h2 class="card-title">Charging Load vs. Grid Price Horizon (Next 12 Hours)</h2>
+                <div class="card-subtitle">AI load-shaping shifts high-kW charging to low-cost grid hours</div>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-input); padding: 0.3rem 0.6rem; border-radius: 6px;">
+              Live Dual-Axis Analytics
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="chargingPricingChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Module 2: Telematics Data Table -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">🚘</span>
+              <div>
+                <h2 class="card-title">EV Fleet Telematics & Battery Health</h2>
+                <div class="card-subtitle">Real-time State of Charge (SOC%), State of Health (SOH%), and Battery Temperature</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls for filtering table -->
+          <div class="table-controls">
+            <input type="text" id="tableSearch" class="search-box" placeholder="Search Vehicle ID or Group...">
+            <div class="filter-tabs">
+              <button class="tab-btn active" onclick="filterTable('ALL')">All EVs</button>
+              <button class="tab-btn" onclick="filterTable('HEALTHY')">Healthy</button>
+              <button class="tab-btn" onclick="filterTable('WARNING')">Warning</button>
+              <button class="tab-btn" onclick="filterTable('CRITICAL')">Critical</button>
+            </div>
+          </div>
+
+          <!-- HTML Table for Telematics Data -->
+          <div class="table-container">
+            <table class="telematics-table">
+              <thead>
+                <tr>
+                  <th>Vehicle ID</th>
+                  <th>Fleet Group</th>
+                  <th>State of Charge (SOC%)</th>
+                  <th>State of Health (SOH%)</th>
+                  <th>Battery Temp</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="telematicsTableBody">
+                <!-- Dynamically populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: AI Optimization Controls & Action Center -->
+      <div class="right-column">
+
+        <!-- Module 3: AI Optimization Sliders Panel -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon">🤖</span>
+              <div>
+                <h2 class="card-title">AI Optimization Control Engine</h2>
+                <div class="card-subtitle">Tune priority trade-offs to recalculate AI scheduling logic</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <!-- Slider 1: Cost Minimization Priority -->
+            <div class="slider-item">
+              <div class="slider-header">
+                <span class="slider-label">Cost Minimization Weight</span>
+                <span class="slider-value-display" id="costValDisplay">80%</span>
+              </div>
+              <input type="range" id="costSlider" min="0" max="100" value="80" step="5">
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+                Prioritizes off-peak energy rates & peak-shaving savings.
+              </div>
+            </div>
+
+            <!-- Slider 2: Battery Longevity Protection -->
+            <div class="slider-item">
+              <div class="slider-header">
+                <span class="slider-label">Battery Longevity Protection</span>
+                <span class="slider-value-display" id="longevityValDisplay">90%</span>
+              </div>
+              <input type="range" id="longevitySlider" min="0" max="100" value="90" step="5">
+              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+                Caps fast-charging thermal stress and limits high SoC dwell time.
+              </div>
+            </div>
+
+            <!-- Quick Preset Buttons -->
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Strategy Presets:</span>
+              <div class="preset-btns">
+                <button class="btn-preset" onclick="setSliders(95, 60)">Max Savings</button>
+                <button class="btn-preset" onclick="setSliders(75, 95)">Max Longevity</button>
+                <button class="btn-preset" onclick="setSliders(50, 50)">Balanced</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Module 4: AI Action Center (Dynamic Recommendation Display) -->
+          <div id="aiActionCenter" class="ai-action-center">
+            <div class="ai-header-bar">
+              <span class="ai-badge" id="aiStatusBadge">✨ AI Recommendation Live</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);" id="aiTimestamp">Updated just now</span>
+            </div>
+
+            <!-- AI Validating & Transparent Text Recommendation -->
+            <p id="aiRecommendationText" class="ai-recommendation-text">
+              <!-- Dynamically populated by JS -->
+            </p>
+
+            <!-- Projected Impact Metrics -->
+            <div class="ai-impact-row">
+              <div class="ai-impact-item">
+                <div class="ai-impact-val" id="impactSavings">$385.00</div>
+                <div class="ai-impact-lbl">Est. Night Savings</div>
+              </div>
+              <div class="ai-impact-item">
+                <div class="ai-impact-val" id="impactLongevity">+18%</div>
+                <div class="ai-impact-lbl">Degradation Saved</div>
+              </div>
+              <div class="ai-impact-item">
+                <div class="ai-impact-val" id="impactShift">2:00 AM</div>
+                <div class="ai-impact-lbl">Optimal Start Time</div>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button id="btnAcceptOptimization" class="btn-accept">
+              <span>Accept & Apply Optimization</span>
+              <span>→</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- System Health Quick Checklist -->
+        <section class="card">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">Grid & Charger Controller Status</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.825rem; margin-top: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
+              <span style="color: var(--text-muted);">Smart Charger Hub #1-12</span>
+              <span class="status-badge healthy">● Active (180 kW)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
+              <span style="color: var(--text-muted);">Grid Demand Response API</span>
+              <span class="status-badge healthy">● Connected</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--text-muted);">V2G Discharge Inverters</span>
+              <span class="status-badge warning">● Discharging (4 EVs)</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==========================================================================
+       FOOTER: Semantic footer
+       ========================================================================== -->
+  <footer>
+    <div class="footer-content">
+      <div>VoltAI Energy & EV Fleet Optimization System &copy; 2026. Built with Pure Vanilla HTML/CSS/JS & Chart.js</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <span style="color: var(--accent-cyan); font-weight: 600;">Status: Operational</span>
+        <span>Version 3.4.0-AI</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       8. JAVASCRIPT ENGINE & LOGIC
+       Contains heavy comments detailing DOM manipulation, Chart.js setup,
+       event handling, dynamic table populating, and AI slider logic.
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       A. DUMMY TELEMATICS DATA ARRAY
+       Array of vehicle objects with SOC%, SOH%, Temperature, and Status.
+       ========================================================================== */
+    const telematicsData = [
+      { id: 'EV-101', group: 'Delivery Logistics', soc: 34, soh: 96, temp: 28, status: 'HEALTHY' },
+      { id: 'EV-102', group: 'Executive Transit', soc: 88, soh: 98, temp: 25, status: 'HEALTHY' },
+      { id: 'EV-103', group: 'Service Fleet',    soc: 18, soh: 84, temp: 41, status: 'CRITICAL' },
+      { id: 'EV-104', group: 'Delivery Logistics', soc: 62, soh: 92, temp: 31, status: 'HEALTHY' },
+      { id: 'EV-105', group: 'Delivery Logistics', soc: 45, soh: 89, temp: 37, status: 'WARNING' },
+      { id: 'EV-106', group: 'Urban Express',     soc: 94, soh: 97, temp: 26, status: 'HEALTHY' },
+      { id: 'EV-107', group: 'Service Fleet',    soc: 22, soh: 82, temp: 39, status: 'WARNING' },
+      { id: 'EV-108', group: 'Urban Express',     soc: 12, soh: 79, temp: 44, status: 'CRITICAL' }
+    ];
+
+    /* ==========================================================================
+       B. DOM ELEMENT REFERENCES
+       Using document.getElementById for fast and clean element access.
+       ========================================================================== */
+    const telematicsTableBody = document.getElementById('telematicsTableBody');
+    const tableSearchInput = document.getElementById('tableSearch');
+    const costSlider = document.getElementById('costSlider');
+    const longevitySlider = document.getElementById('longevitySlider');
+    const costValDisplay = document.getElementById('costValDisplay');
+    const longevityValDisplay = document.getElementById('longevityValDisplay');
+    const aiRecommendationText = document.getElementById('aiRecommendationText');
+    const aiActionCenter = document.getElementById('aiActionCenter');
+    const aiStatusBadge = document.getElementById('aiStatusBadge');
+    const btnAcceptOptimization = document.getElementById('btnAcceptOptimization');
+    const impactSavings = document.getElementById('impactSavings');
+    const impactLongevity = document.getElementById('impactLongevity');
+    const impactShift = document.getElementById('impactShift');
+
+    // State tracking variables
+    let currentFilter = 'ALL';
+    let isOptimizationApplied = false;
+
+    /* ==========================================================================
+       C. FUNCTION: DYNAMIC TABLE POPULATION
+       Loops through telematics data array and constructs HTML table rows.
+       Uses semantic status tags and dynamic CSS progress bars.
+       ========================================================================== */
+    function renderTelematicsTable(data) {
+      // 1. Clear existing table rows
+      telematicsTableBody.innerHTML = '';
+
+      // 2. Handle empty state
+      if (data.length === 0) {
+        telematicsTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+              No EV telematics records found matching criteria.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      // 3. Loop over data array and generate rows
+      data.forEach(vehicle => {
+        const tr = document.createElement('tr');
+
+        // Determine Status Badge HTML & Color Theme
+        let statusBadgeHtml = '';
+        let progressColor = 'var(--status-green)';
+
+        if (vehicle.status === 'HEALTHY') {
+          statusBadgeHtml = `<span class="status-badge healthy">● Healthy</span>`;
+          progressColor = 'var(--status-green)';
+        } else if (vehicle.status === 'WARNING') {
+          statusBadgeHtml = `<span class="status-badge warning">▲ Throttled</span>`;
+          progressColor = 'var(--status-yellow)';
+        } else {
+          statusBadgeHtml = `<span class="status-badge critical">✖ Critical / Hot</span>`;
+          progressColor = 'var(--status-red)';
+        }
+
+        // Construct HTML content for single row
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: var(--text-main);">${vehicle.id}</td>
+          <td style="color: var(--text-muted);">${vehicle.group}</td>
+          <td>
+            <div class="progress-bar-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" style="width: ${vehicle.soc}%; background-color: ${progressColor};"></div>
+              </div>
+              <span class="progress-val">${vehicle.soc}%</span>
+            </div>
+          </td>
+          <td>
+            <div class="progress-bar-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" style="width: ${vehicle.soh}%; background-color: var(--accent-cyan);"></div>
+              </div>
+              <span class="progress-val">${vehicle.soh}%</span>
+            </div>
+          </td>
+          <td style="font-weight: 600; color: ${vehicle.temp > 40 ? 'var(--status-red)' : 'var(--text-main)'};">
+            ${vehicle.temp}°C
+          </td>
+          <td>${statusBadgeHtml}</td>
+        `;
+
+        // Append generated <tr> to table body
+        telematicsTableBody.appendChild(tr);
+      });
+    }
+
+    /* ==========================================================================
+       D. TABLE FILTERING & SEARCH EVENT LISTENERS
+       Filter array by search query or status tab clicks.
+       ========================================================================== */
+    function filterTable(status) {
+      currentFilter = status;
+
+      // Update active state on filter tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toUpperCase().includes(status)) {
+          btn.classList.add('active');
+        }
+      });
+
+      applyTableFilters();
+    }
+
+    function applyTableFilters() {
+      const searchTerm = tableSearchInput.value.toLowerCase().trim();
+
+      const filtered = telematicsData.filter(item => {
+        const matchesStatus = (currentFilter === 'ALL') || (item.status === currentFilter);
+        const matchesSearch = item.id.toLowerCase().includes(searchTerm) || 
+                              item.group.toLowerCase().includes(searchTerm);
+        return matchesStatus && matchesSearch;
+      });
+
+      renderTelematicsTable(filtered);
+    }
+
+    // Attach search input listener
+    tableSearchInput.addEventListener('input', applyTableFilters);
+
+    /* ==========================================================================
+       E. CHART.JS DUAL-AXIS LINE/BAR CHART INITIALIZATION
+       - Left Y-Axis: Grid Electricity Pricing ($/kWh) -> Line Dataset
+       - Right Y-Axis: Scheduled Fleet Charging Load (kW) -> Bar Dataset
+       ========================================================================== */
+    const ctx = document.getElementById('chargingPricingChart').getContext('2d');
+
+    // 12-Hour Labels starting from 12:00 PM to 11:00 PM
+    const hoursLabels = ['12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
+
+    // Initial Pricing ($/kWh) - Peaks between 4 PM and 8 PM
+    const electricityPrices = [0.18, 0.22, 0.28, 0.35, 0.45, 0.48, 0.46, 0.42, 0.32, 0.24, 0.16, 0.12];
+
+    // Initial Scheduled Charging Load (kW) - High during peak initially before AI shift
+    let scheduledChargingLoad = [140, 160, 190, 220, 240, 210, 180, 150, 90, 60, 40, 20];
+
+    const chargingPricingChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: hoursLabels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Grid Price ($/kWh)',
+            data: electricityPrices,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yPrice',
+            pointRadius: 4,
+            pointHoverRadius: 7
+          },
+          {
+            type: 'bar',
+            label: 'Scheduled Fleet Load (kW)',
+            data: scheduledChargingLoad,
+            backgroundColor: 'rgba(6, 182, 212, 0.65)',
+            borderColor: '#06b6d4',
+            borderWidth: 1,
+            borderRadius: 6,
+            yAxisID: 'yLoad'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#94a3b8',
+              font: { family: 'Inter', size: 12, weight: '600' }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } }
+          },
+          yPrice: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: {
+              display: true,
+              text: 'Price ($/kWh)',
+              color: '#f59e0b',
+              font: { weight: 'bold' }
+            },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: {
+              color: '#f59e0b',
+              callback: function(value) { return '$' + value.toFixed(2); }
+            }
+          },
+          yLoad: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: {
+              display: true,
+              text: 'Power Load (kW)',
+              color: '#06b6d4',
+              font: { weight: 'bold' }
+            },
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: '#06b6d4',
+              callback: function(value) { return value + ' kW'; }
+            }
+          }
+        }
+      }
+    });
+
+    /* ==========================================================================
+       F. AI OPTIMIZATION & RECOMMENDATION ENGINE LOGIC
+       - Listens to input changes on range sliders.
+       - Generates VALIDATING and TRANSPARENT text explicitly naming the current
+         grid situation before delivering actionable solutions.
+       ========================================================================== */
+    function updateAIRecommendation() {
+      const costWeight = parseInt(costSlider.value);
+      const longevityWeight = parseInt(longevitySlider.value);
+
+      // Update text values next to sliders
+      costValDisplay.textContent = costWeight + '%';
+      longevityValDisplay.textContent = longevityWeight + '%';
+
+      // Reset applied visual state if user adjusts sliders again
+      if (isOptimizationApplied) {
+        aiActionCenter.classList.remove('applied');
+        aiStatusBadge.textContent = '✨ AI Recommendation Live';
+        aiStatusBadge.style.color = '#a5b4fc';
+        btnAcceptOptimization.innerHTML = `<span>Accept & Apply Optimization</span><span>→</span>`;
+        isOptimizationApplied = false;
+      }
+
+      // Calculate transparent AI recommendation text based on slider parameters
+      let text = '';
+      let savings = 0;
+      let longevityPct = 0;
+      let shiftTime = '2:00 AM';
+
+      if (costWeight >= 70 && longevityWeight >= 70) {
+        // High Cost Savings + High Battery Longevity
+        text = `Grid electricity prices are currently peaking at <strong>$0.48/kWh</strong> between 4:00 PM and 7:00 PM, while Fleet B (Delivery Logistics) requires a 85% state of charge for tomorrow's 6:00 AM dispatch. To honor your <strong>${costWeight}% Cost Minimization</strong> and <strong>${longevityWeight}% Longevity Protection</strong>, I recommend throttling high-kW fast charging immediately and shifting 210 kW of load to 2:00 AM when grid rates drop to <strong>$0.12/kWh</strong>.`;
+        savings = 420;
+        longevityPct = 22;
+        shiftTime = '2:00 AM';
+      } else if (costWeight > longevityWeight) {
+        // Aggressive Cost Minimization
+        text = `Grid demand charges are high right now at <strong>$0.48/kWh</strong>. With your <strong>${costWeight}% Cost Priority</strong> setting, I recommend initiating Vehicle-to-Grid (V2G) discharge for 4 parked EVs into the grid right now to capitalize on feed-in tariffs, followed by deferred overnight charging starting at 3:00 AM.`;
+        savings = 510;
+        longevityPct = 12;
+        shiftTime = '3:00 AM';
+      } else if (longevityWeight > costWeight) {
+        // Battery Longevity Priority
+        text = `Two vehicles in Fleet Service (EV-103 & EV-108) are exhibiting elevated battery temperatures of <strong>41°C+</strong>. With your <strong>${longevityWeight}% Longevity Protection</strong> priority, I recommend enforcing strict 30 kW trickle-charging and capping maximum State of Charge at 80% to eliminate high-temperature degradation cycles.`;
+        savings = 260;
+        longevityPct = 34;
+        shiftTime = '1:00 AM';
+      } else {
+        // Balanced Mode
+        text = `Current grid rates are moderate at <strong>$0.35/kWh</strong> and average fleet SOC is healthy at 76%. With a <strong>Balanced 50/50 Strategy</strong>, I recommend distributing charging loads evenly across 6 chargers from 11:00 PM onwards to ensure all vehicles reach 90% SOC without triggering peak demand surcharges.`;
+        savings = 310;
+        longevityPct = 15;
+        shiftTime = '11:00 PM';
+      }
+
+      // Update AI Recommendation HTML text dynamically
+      aiRecommendationText.innerHTML = text;
+
+      // Update projected metrics
+      impactSavings.textContent = `$${savings}.00`;
+      impactLongevity.textContent = `+${longevityPct}%`;
+      impactShift.textContent = shiftTime;
+    }
+
+    // Attach Event Listeners to Range Sliders (real-time 'input' event)
+    costSlider.addEventListener('input', updateAIRecommendation);
+    longevitySlider.addEventListener('input', updateAIRecommendation);
+
+    // Helper function for quick strategy presets
+    function setSliders(cost, longevity) {
+      costSlider.value = cost;
+      longevitySlider.value = longevity;
+      updateAIRecommendation();
+    }
+
+    /* ==========================================================================
+       G. ACCEPT RECOMMENDATION BUTTON HANDLER
+       - Triggers JavaScript alert() as requested.
+       - Dynamically turns the AI Action Center card GREEN (Healthy State).
+       - Simulates load shift on Chart.js by moving peak load bars to night hours!
+       ========================================================================== */
+    btnAcceptOptimization.addEventListener('click', function() {
+      // 1. Trigger requested JS alert modal
+      alert("✅ AI Optimization Strategy Successfully Accepted!\n\nFleet charging schedules, V2G discharge parameters, and smart charger load-shaping have been updated across all 42 active EVs.");
+
+      // 2. Change AI Action Center styling to GREEN / Healthy state
+      aiActionCenter.classList.add('applied');
+      aiStatusBadge.textContent = '✓ OPTIMIZATION ACTIVE & ENFORCED';
+      btnAcceptOptimization.innerHTML = `<span>Optimization Applied Successfully</span> <span>✓</span>`;
+      isOptimizationApplied = true;
+
+      // 3. Dynamic Chart load-shaping feedback: Shift load from peak hours (4-7 PM) to night hours (10-11 PM)
+      const optimizedLoad = [40, 30, 20, 20, 30, 25, 30, 50, 110, 180, 240, 260];
+      chargingPricingChart.data.datasets[1].data = optimizedLoad;
+      chargingPricingChart.data.datasets[1].backgroundColor = 'rgba(16, 185, 129, 0.7)';
+      chargingPricingChart.data.datasets[1].borderColor = '#10b981';
+      chargingPricingChart.update();
+    });
+
+    /* ==========================================================================
+       H. INITIALIZATION ON PAGE LOAD
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Render table on initial page load
+      renderTelematicsTable(telematicsData);
+      
+      // Calculate initial AI recommendation
+      updateAIRecommendation();
+    });
+  </script>
+</body>
+</html>
